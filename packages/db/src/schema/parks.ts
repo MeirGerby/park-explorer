@@ -1,6 +1,6 @@
 import { pgTable, uuid, text, timestamp, jsonb } from "drizzle-orm/pg-core"
-import { user } from "./user"
-import { city } from "./city"
+import { users } from "./users"
+import { cities } from "./cities"
 
 
 export const park = pgTable("parks", {
@@ -12,7 +12,7 @@ export const park = pgTable("parks", {
 
     creatorId: uuid("creator_id")
         .notNull()
-        .references(() => user.id),
+        .references(() => users.id),
 
     openedAt: timestamp('opened_at', {
         withTimezone: true
@@ -20,7 +20,7 @@ export const park = pgTable("parks", {
 
     cityId: uuid("city_id")
         .notNull()
-        .references(() => city.id),
+        .references(() => cities.id),
 
     location: jsonb("location"),
 

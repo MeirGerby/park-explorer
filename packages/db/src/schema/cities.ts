@@ -1,14 +1,14 @@
 import { text, uuid } from "drizzle-orm/cockroach-core";
 import { pgTable } from "drizzle-orm/pg-core";
-import { region } from './region'
+import { regions } from './regions'
 
 
-export const city = pgTable('city', {
+export const cities = pgTable('city', {
     id: uuid('id').defaultRandom().primaryKey(),
 
     name: text('name').notNull(),
 
     regionId: uuid('id')
         .notNull()
-        .references(() => region.id)
+        .references(() => regions.id)
 })

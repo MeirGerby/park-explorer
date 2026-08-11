@@ -1,7 +1,7 @@
 import { pgTable, uuid, text } from "drizzle-orm/pg-core";
-import { park } from "./park";
+import { park } from "./parks";
 
-export const parkImage = pgTable("park_image", {
+export const parkImages = pgTable("park_image", {
     id: uuid("id").defaultRandom().primaryKey(),
 
     parkId: uuid("park_id")
