@@ -22,7 +22,7 @@ async function seed() {
       .values({
         name: regionData.name,
       })
-      .returning({ id: regions.id });
+      .returning();
 
     await db.insert(cities).values(
       regionData.cities.map((cityName) => ({
@@ -36,10 +36,10 @@ async function seed() {
 }
 
 seed()
-.catch((error) => {
+  .catch((error) => {
     console.error("Seed failed:", error);
     process.exit(1);
-})
-.finally(async () => {
-    await pool.end()
-})
+  })
+  .finally(async () => {
+    await pool.end();
+  });
