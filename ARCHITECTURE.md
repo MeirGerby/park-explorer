@@ -218,7 +218,6 @@ Both are part of the repository and should be reproducible on a fresh database.
 
 ## Core Architectural Principles
 
-* [ ] 
 * **Clear separation of responsibilities**
 * **Database infrastructure stays in `packages/db`**
 * **Business logic and data access stay in `apps/api`**
