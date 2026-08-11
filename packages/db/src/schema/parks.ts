@@ -3,7 +3,7 @@ import { users } from "./users"
 import { cities } from "./cities"
 
 
-export const park = pgTable("parks", {
+export const parks = pgTable("parks", {
     id: uuid("id").defaultRandom().primaryKey(),
 
     name: text("name").notNull(),

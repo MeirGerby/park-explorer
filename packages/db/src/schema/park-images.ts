@@ -1,12 +1,12 @@
 import { pgTable, uuid, text } from "drizzle-orm/pg-core";
-import { park } from "./parks";
+import { parks } from "./parks";
 
-export const parkImages = pgTable("park_image", {
+export const parkImages = pgTable("park_images", {
     id: uuid("id").defaultRandom().primaryKey(),
 
     parkId: uuid("park_id")
         .notNull()
-        .references(() => park.id, {
+        .references(() => parks.id, {
             onDelete: "cascade"
         }),
 
