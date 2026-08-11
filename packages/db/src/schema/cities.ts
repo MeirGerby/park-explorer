@@ -1,5 +1,4 @@
-import { text, uuid } from "drizzle-orm/cockroach-core";
-import { pgTable } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text } from "drizzle-orm/pg-core";
 import { regions } from './regions'
 
 
