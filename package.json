@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
-    "drizzle-kit": "^1.0.0-rc.4",
+    "drizzle-kit": "^0.31.10",
     "prettier": "^3.7.4",
     "tsx": "^4.23.12",
     "turbo": "^2.10.9",
@@ -36,6 +36,6 @@
     "@trpc/server": "^11.18.0",
     "@trpc/tanstack-react-query": "^11.18.0",
     "dotenv": "^17.4.2",
-    "drizzle-orm": "^1.0.0-rc.4"
+    "drizzle-orm": "^0.45.2"
   }
 }
