@@ -10,7 +10,6 @@
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
-    "drizzle-kit": "^0.31.10",
     "prettier": "^3.7.4",
     "tsx": "^4.23.12",
     "turbo": "^2.10.9",
@@ -28,14 +27,5 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "dependencies": {
-    "@neondatabase/serverless": "^1.1.0",
-    "@tanstack/react-query": "^5.101.4",
-    "@trpc/client": "^11.18.0",
-    "@trpc/server": "^11.18.0",
-    "@trpc/tanstack-react-query": "^11.18.0",
-    "dotenv": "^17.4.2",
-    "drizzle-orm": "^0.45.2"
-  }
+  ]
 }
