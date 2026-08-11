@@ -1,8 +1,8 @@
 import { createTRPCReact } from "@trpc/react-query"
 import { createTRPCClient, httpBatchLink } from "@trpc/client"
-import type { AppRouter } from "api"
+import type { AppRouter } from "../../../api/src/@generated/server"
 
-// יצירת ה-Proxy Client שמאפשר גישה ישירה כמו trpc.health.useQuery()
+
 export const trpc = createTRPCReact<AppRouter>()
 
 export const trpcClient = createTRPCClient<AppRouter>({
