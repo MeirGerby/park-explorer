@@ -1,4 +1,4 @@
-import { pgTable, uuid, text } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, index } from "drizzle-orm/pg-core";
 import { parks } from "./parks.js";
 
 export const parkImages = pgTable("park_images", {
@@ -12,4 +12,11 @@ export const parkImages = pgTable("park_images", {
 
     url: text('url').notNull(),
 
-})
+    caption: text('caption'),
+
+    createdAt: timestamp('created_at', {
+        withTimezone: true
+    }).defaultNow().notNull(),
+}, (table) => [
+    index('park_images_park_id_idx').on(table.parkId),
+])
