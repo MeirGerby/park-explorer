@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DRIZZLE } from '../database/database.module.js';
-import { and, eq, type Database, parks, cities, regions, parkImages } from '@park-explorer/db';
+import { and, eq, type Database, parks, cities, regions, parkImages, users } from '@park-explorer/db';
 import type {
   CreateParkInput,
   GetParksInput,
@@ -15,12 +15,20 @@ export class ParkCityNotFoundError extends Error {
   }
 }
 
+export class ParkCreatorNotFoundError extends Error {
+  constructor(public readonly creatorId: string) {
+    super(`User '${creatorId}' was not found.`);
+    this.name = 'ParkCreatorNotFoundError';
+  }
+}
+
 const parkSelection = {
   id: parks.id,
   name: parks.name,
   description: parks.description,
-  latitude: parks.latitude,
-  longitude: parks.longitude,
+  openedAt: parks.openedAt,
+  location: parks.location,
+  polygon: parks.polygon,
   cityName: cities.name,
   regionName: regions.name,
 };
@@ -81,14 +89,26 @@ export class ParksService {
         throw new ParkCityNotFoundError(data.cityId);
       }
 
+      const [creator] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, data.creatorId))
+        .limit(1);
+
+      if (!creator) {
+        throw new ParkCreatorNotFoundError(data.creatorId);
+      }
+
       const [park] = await tx
         .insert(parks)
         .values({
           name: data.name,
           description: data.description,
-          latitude: data.latitude,
-          longitude: data.longitude,
+          creatorId: data.creatorId,
+          openedAt: data.openedAt,
           cityId: data.cityId,
+          location: data.location,
+          polygon: data.polygon,
         })
         .returning();
 
@@ -113,8 +133,9 @@ export class ParksService {
         id: park.id,
         name: park.name,
         description: park.description,
-        latitude: park.latitude,
-        longitude: park.longitude,
+        openedAt: park.openedAt,
+        location: park.location,
+        polygon: park.polygon,
         cityName: location.cityName,
         regionName: location.regionName,
         images,
