@@ -7,7 +7,7 @@ export const cities = pgTable('cities', {
 
     name: text('name').notNull(),
 
-    regionId: uuid('id')
+    regionId: uuid('region_id')
         .notNull()
         .references(() => regions.id)
 })
