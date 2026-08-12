@@ -1,5 +1,5 @@
 import { pgTable, uuid, text } from "drizzle-orm/pg-core";
-import { regions } from './regions'
+import { regions } from './regions.js'
 
 
 export const cities = pgTable('cities', {

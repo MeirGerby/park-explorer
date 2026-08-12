@@ -1,6 +1,6 @@
 import { pgTable, uuid, text, timestamp, jsonb } from "drizzle-orm/pg-core"
-import { users } from "./users"
-import { cities } from "./cities"
+import { users } from "./users.js"
+import { cities } from "./cities.js"
 
 
 export const parks = pgTable("parks", {
