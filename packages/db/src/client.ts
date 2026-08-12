@@ -2,7 +2,7 @@ import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import "dotenv/config";
 
-export function createDatabaseClient(connectionString: string) {
+function createDatabaseClient(connectionString: string) {
   const pool = new Pool({
     connectionString,
   });
@@ -17,15 +17,14 @@ export function createDatabaseClient(connectionString: string) {
   };
 }
 
-const connectionString = process.env.DATABASE_URL;
+export function getDatabaseConnection(connectionString: string) {
 
-if (!connectionString) {
-  throw new Error("DATABASE_URL environment variable is required for seeding.");
+  if (!connectionString) {
+    throw new Error("A database connection string or DATABASE_URL environment variable is required.");
+  }
+
+  return createDatabaseClient(connectionString);
 }
-
-export const { db, pool } = createDatabaseClient(
-  connectionString ?? "",
-);
 
 export type Database = ReturnType<typeof createDatabaseClient>["db"];
 export type DatabasePool = ReturnType<typeof createDatabaseClient>["pool"];
