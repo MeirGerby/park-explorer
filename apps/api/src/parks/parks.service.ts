@@ -1,39 +1,124 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { DRIZZLE } from '../database/database.module';
-import { type Database, parks, cities, regions } from '@park-explorer/db';
-import { eq } from 'drizzle-orm';
+import { DRIZZLE } from '../database/database.module.js';
+import { and, eq, type Database, parks, cities, regions, parkImages } from '@park-explorer/db';
+import type {
+  CreateParkInput,
+  GetParksInput,
+  ParkDetailOutput,
+  ParkOutput,
+} from './dto/park.dto.js';
+
+export class ParkCityNotFoundError extends Error {
+  constructor(public readonly cityId: string) {
+    super(`City '${cityId}' was not found.`);
+    this.name = 'ParkCityNotFoundError';
+  }
+}
+
+const parkSelection = {
+  id: parks.id,
+  name: parks.name,
+  description: parks.description,
+  latitude: parks.latitude,
+  longitude: parks.longitude,
+  cityName: cities.name,
+  regionName: regions.name,
+};
 
 @Injectable()
 export class ParksService {
   constructor(@Inject(DRIZZLE) private readonly db: Database) {}
 
-  async findAllParks() {
-    return await this.db
-      .select({
-        id: parks.id,
-        name: parks.name,
-        cityName: cities.name,
-        regionName: regions.name,
-      })
+  async findAll(params?: GetParksInput): Promise<ParkOutput[]> {
+    const filters = [
+      params?.cityId ? eq(parks.cityId, params.cityId) : undefined,
+      params?.regionId ? eq(regions.id, params.regionId) : undefined,
+    ].filter((filter): filter is NonNullable<typeof filter> => filter !== undefined);
+
+    return this.db
+      .select(parkSelection)
       .from(parks)
       .innerJoin(cities, eq(parks.cityId, cities.id))
-      .innerJoin(regions, eq(cities.regionId, regions.id));
+      .innerJoin(regions, eq(cities.regionId, regions.id))
+      .where(filters.length > 0 ? and(...filters) : undefined);
   }
 
-  async findParkById(id: string) {
-    const results = await this.db
-      .select({
-        id: parks.id,
-        name: parks.name,
-        cityName: cities.name,
-        regionName: regions.name,
-      })
+  async findById(id: string): Promise<ParkDetailOutput | null> {
+    const [park] = await this.db
+      .select(parkSelection)
       .from(parks)
       .innerJoin(cities, eq(parks.cityId, cities.id))
       .innerJoin(regions, eq(cities.regionId, regions.id))
       .where(eq(parks.id, id))
       .limit(1);
 
-    return results[0] ?? null;
+    if (!park) {
+      return null;
+    }
+
+    const images = await this.db
+      .select({
+        id: parkImages.id,
+        url: parkImages.url,
+        caption: parkImages.caption,
+      })
+      .from(parkImages)
+      .where(eq(parkImages.parkId, id));
+
+    return { ...park, images };
+  }
+
+  async create(data: CreateParkInput): Promise<ParkDetailOutput> {
+    return this.db.transaction(async (tx) => {
+      const [location] = await tx
+        .select({ cityName: cities.name, regionName: regions.name })
+        .from(cities)
+        .innerJoin(regions, eq(cities.regionId, regions.id))
+        .where(eq(cities.id, data.cityId))
+        .limit(1);
+
+      if (!location) {
+        throw new ParkCityNotFoundError(data.cityId);
+      }
+
+      const [park] = await tx
+        .insert(parks)
+        .values({
+          name: data.name,
+          description: data.description,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          cityId: data.cityId,
+        })
+        .returning();
+
+      const images = data.images?.length
+        ? await tx
+            .insert(parkImages)
+            .values(
+              data.images.map((image) => ({
+                url: image.url,
+                caption: image.caption,
+                parkId: park.id,
+              })),
+            )
+            .returning({
+              id: parkImages.id,
+              url: parkImages.url,
+              caption: parkImages.caption,
+            })
+        : [];
+
+      return {
+        id: park.id,
+        name: park.name,
+        description: park.description,
+        latitude: park.latitude,
+        longitude: park.longitude,
+        cityName: location.cityName,
+        regionName: location.regionName,
+        images,
+      };
+    });
   }
 }
