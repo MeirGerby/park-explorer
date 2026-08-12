@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Router, Query, Mutation, Input } from 'nestjs-trpc';
 import { TRPCError } from '@trpc/server';
-import { ParkCityNotFoundError, ParksService } from './parks.service.js';
+import { ParkCityNotFoundError, ParkCreatorNotFoundError, ParksService } from './parks.service.js';
 import {
   createParkInputSchema,
   getParkByIdInputSchema,
@@ -73,7 +73,7 @@ export class ParksRouter {
     try {
       return await this.parksService.create(data);
     } catch (error) {
-      if (error instanceof ParkCityNotFoundError) {
+      if (error instanceof ParkCityNotFoundError || error instanceof ParkCreatorNotFoundError) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: error.message,
