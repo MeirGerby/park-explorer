@@ -1,6 +1,10 @@
 import "dotenv/config";
 import { migrate } from "drizzle-orm/neon-serverless/migrator";
 import { getDatabaseConnection } from "./client.js";
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
