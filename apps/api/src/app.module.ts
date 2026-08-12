@@ -1,14 +1,20 @@
 import { Module } from '@nestjs/common';
-import { TRPCModule } from 'nestjs-trpc'
+import { ConfigModule } from '@nestjs/config';
+import { TRPCModule } from 'nestjs-trpc';
+
 import { UsersModule } from './users/users.module';
-import { HealthModule } from './health/health.module';
 import { HealthRouter } from './app.router';
+import { DatabaseModule } from './database/database.module';
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '../../../.env',
+    }),
+    DatabaseModule,
     TRPCModule.forRoot({}),
     UsersModule,
-    HealthModule,
   ],
-  controllers: [HealthRouter]
+  controllers: [HealthRouter],
 })
-export class AppModule { }
+export class AppModule {}
