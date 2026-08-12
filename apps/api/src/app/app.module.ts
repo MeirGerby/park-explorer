@@ -2,18 +2,20 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TRPCModule } from 'nestjs-trpc';
 
-import { UsersModule } from './users/users.module';
-import { HealthRouter } from './app.router';
-import { DatabaseModule } from './database/database.module';
+import { HealthRouter } from './app.router.js';
+import { DatabaseModule } from '../database/database.module.js';
+import { ParksModule } from '../parks/parks.module.js';
+import { join } from 'node:path';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '../../../.env',
+      envFilePath: join(__dirname, '../../../../.env'),
     }),
     DatabaseModule,
     TRPCModule.forRoot({}),
-    UsersModule,
+    ParksModule,
   ],
   controllers: [HealthRouter],
 })
