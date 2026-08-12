@@ -1,6 +1,9 @@
 import "dotenv/config";
 import { migrate } from "drizzle-orm/neon-serverless/migrator";
-import { db, pool } from "./client";
+import { getDatabaseConnection } from "./client";
+
+const connectionString = process.env.DATABASE_URL
+const { db, pool } = getDatabaseConnection(connectionString)
 
 async function runMigrations() {
   console.log("Running migrations...");

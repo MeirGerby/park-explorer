@@ -1,4 +1,8 @@
-import { db, regions, cities, pool } from "../index";
+import { getDatabaseConnection, regions, cities } from "../index";
+
+const connectionString = process.env.DATABASE_URL 
+
+const {db, pool } = getDatabaseConnection(connectionString)
 
 const seedData = [
   {
