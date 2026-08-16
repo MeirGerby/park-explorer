@@ -13,22 +13,18 @@ import { z } from "zod";
 
 const t = initTRPC.create();
 const publicProcedure = t.procedure;
-import type { HealthRouter } from "../health/health.router.js";
+import { parkListOutputSchema, parkOutputSchema } from "../parks/dto/park.dto";
 
 const appRouter = t.router({
-  health: t.router({
-    health: publicProcedure
-      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as unknown as Awaited<ReturnType<HealthRouter["health"]>>)
-  }),
-  users: t.router({
-    getUserById: publicProcedure
-      .input(z.object({ userId: z.string() }))
-      .output(z.object({
-        name: z.string(),
-        email: z.string()
-      }))
+  parks: t.router({
+    getParks: publicProcedure
+      .output(parkListOutputSchema)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getParkById: publicProcedure
+      .input(z.object({ id: z.uuid() }))
+      .output(parkOutputSchema)
       .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
-  })
+    })
 });
 
 export type AppRouter = typeof appRouter;

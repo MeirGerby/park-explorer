@@ -1,4 +1,3 @@
-
 # Park Explorer — Architecture
 
 ## Overview
@@ -219,10 +218,10 @@ Both are part of the repository and should be reproducible on a fresh database.
 
 ## Core Architectural Principles
 
-1. **Clear separation of responsibilities**
-2. **Database infrastructure stays in `packages/db`**
-3. **Business logic and data access stay in `apps/api`**
-4. **Frontend communicates only through the API**
-5. **Avoid duplicated API/database type definitions**
-6. **Do not introduce abstractions before they are needed**
-7. **Keep the architecture simple and evolve it with the application**
+* **Clear separation of responsibilities**
+* **Database infrastructure stays in `packages/db`**
+* **Business logic and data access stay in `apps/api`**
+* **Frontend communicates only through the API**
+* **Avoid duplicated API/database type definitions**
+* **Do not introduce abstractions before they are needed**
+* **Keep the architecture simple and evolve it with the application**
