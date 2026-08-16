@@ -1,12 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { AuthRepository } from './auth.repository.js';
-import type { LoginInput, UserOutput } from './dto/auth.dto.js';
+import type { LoginInput, RegisterInput, UserOutput } from './dto/auth.dto.js';
 
 export class InvalidCredentialsError extends Error {
   constructor() {
     super('Invalid email or password.');
     this.name = 'InvalidCredentialsError';
+  }
+}
+
+export class EmailAlreadyTakenError extends Error {
+  constructor(public readonly email: string) {
+    super(`Email '${email}' is already registered.`);
+    this.name = 'EmailAlreadyTakenError';
   }
 }
 
@@ -32,6 +39,25 @@ export class AuthService {
     if (!user || !passwordValid) {
       throw new InvalidCredentialsError();
     }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+  }
+
+  async register(data: RegisterInput): Promise<UserOutput> {
+    const passwordHash = await argon2.hash(data.password);
+
+    const user = await this.authRepository.create(
+      { name: data.name, email: data.email, passwordHash },
+      {
+        onEmailTaken: () => {
+          throw new EmailAlreadyTakenError(data.email);
+        },
+      },
+    );
 
     return {
       id: user.id,
