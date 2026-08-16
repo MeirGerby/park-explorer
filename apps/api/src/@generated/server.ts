@@ -13,17 +13,36 @@ import { z } from "zod";
 
 const t = initTRPC.create();
 const publicProcedure = t.procedure;
-import { parkListOutputSchema, parkOutputSchema } from "../parks/dto/park.dto";
+import { loginInputSchema, userOutputSchema, registerInputSchema } from "../auth/dto/auth.dto.js";
+import { getParksInputSchema, parkListOutputSchema, getParkByIdInputSchema, parkDetailOutputSchema, createParkInputSchema } from "../parks/dto/park.dto.js";
 
 const appRouter = t.router({
+  auth: t.router({
+    login: publicProcedure
+      .input(loginInputSchema)
+      .output(userOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    register: publicProcedure
+      .input(registerInputSchema)
+      .output(userOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    me: publicProcedure
+      .output(userOutputSchema)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+    }),
   parks: t.router({
     getParks: publicProcedure
+      .input(getParksInputSchema)
       .output(parkListOutputSchema)
       .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     getParkById: publicProcedure
-      .input(z.object({ id: z.uuid() }))
-      .output(parkOutputSchema)
-      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+      .input(getParkByIdInputSchema)
+      .output(parkDetailOutputSchema)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    createPark: publicProcedure
+      .input(createParkInputSchema)
+      .output(parkDetailOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
     })
 });
 
