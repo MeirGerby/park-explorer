@@ -5,6 +5,7 @@ import { TRPCModule } from 'nestjs-trpc';
 import { HealthRouter } from './app.router.js';
 import { DatabaseModule } from '../database/database.module.js';
 import { ParksModule } from '../parks/parks.module.js';
+import { AuthModule } from '../auth/auth.module.js';
 import { join } from 'node:path';
 
 @Module({
@@ -16,6 +17,7 @@ import { join } from 'node:path';
     DatabaseModule,
     TRPCModule.forRoot({}),
     ParksModule,
+    AuthModule,
   ],
   controllers: [HealthRouter],
 })
