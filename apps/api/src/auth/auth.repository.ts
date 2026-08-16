@@ -16,6 +16,16 @@ export class AuthRepository {
     return user ?? null;
   }
 
+  async findById(id: string) {
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
+    return user ?? null;
+  }
+
   async create(
     data: { name: string; email: string; passwordHash: string },
     handlers: { onEmailTaken: () => never },
