@@ -1,6 +1,7 @@
-import { ParkList } from "./components/ParkList";
 import { AuthPage } from "./features/auth/components/AuthPage";
 import { useCurrentUser } from "./features/auth/hooks/use-current-user";
+import { RegionsSection } from "./features/regions/components/RegionsSection";
+import { ParksSection } from "./features/parks/components/ParksSection";
 
 function App() {
   const { data: user, isLoading, isError } = useCurrentUser();
@@ -15,10 +16,14 @@ function App() {
 
   return (
     <div>
-      <header className="border-b border-border p-4 text-sm text-muted-foreground">
-        Signed in as {user.name}
+      <header className="flex items-center justify-between border-b border-border p-4">
+        <h1 className="text-lg font-bold">Park Explorer</h1>
+        <p className="text-sm text-muted-foreground">Signed in as {user.name}</p>
       </header>
-      <ParkList />
+      <main className="mx-auto grid max-w-4xl gap-8 p-6">
+        <RegionsSection />
+        <ParksSection />
+      </main>
     </div>
   );
 }
