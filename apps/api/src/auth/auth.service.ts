@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { AuthRepository } from './auth.repository.js';
+import { SessionService } from './session.service.js';
 import type { LoginInput, RegisterInput, UserOutput } from './dto/auth.dto.js';
 
 export class InvalidCredentialsError extends Error {
@@ -17,6 +18,13 @@ export class EmailAlreadyTakenError extends Error {
   }
 }
 
+export class UserNotFoundError extends Error {
+  constructor(public readonly userId: string) {
+    super(`User '${userId}' was not found.`);
+    this.name = 'UserNotFoundError';
+  }
+}
+
 // A precomputed argon2 hash with no matching plaintext password. Verifying
 // against it when the email isn't found keeps login's response time roughly
 // constant, so timing can't be used to tell "unknown email" apart from
@@ -24,11 +32,19 @@ export class EmailAlreadyTakenError extends Error {
 const DUMMY_PASSWORD_HASH =
   '$argon2id$v=19$m=65536,p=4,t=3$nLTxinLslvuuggseiIbVdw$jNAObRq+JOTk+paEBRXs11IzPVkpYGKa1W5XDhpNfFQ';
 
+export interface AuthResult {
+  user: UserOutput;
+  sessionId: string;
+}
+
 @Injectable()
 export class AuthService {
-  constructor(private readonly authRepository: AuthRepository) {}
+  constructor(
+    private readonly authRepository: AuthRepository,
+    private readonly sessionService: SessionService,
+  ) {}
 
-  async login(data: LoginInput): Promise<UserOutput> {
+  async login(data: LoginInput): Promise<AuthResult> {
     const user = await this.authRepository.findByEmail(data.email);
 
     const passwordValid = await argon2.verify(
@@ -41,13 +57,12 @@ export class AuthService {
     }
 
     return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
+      user: { id: user.id, name: user.name, email: user.email },
+      sessionId: this.sessionService.create(user.id),
     };
   }
 
-  async register(data: RegisterInput): Promise<UserOutput> {
+  async register(data: RegisterInput): Promise<AuthResult> {
     const passwordHash = await argon2.hash(data.password);
 
     const user = await this.authRepository.create(
@@ -60,9 +75,18 @@ export class AuthService {
     );
 
     return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
+      user: { id: user.id, name: user.name, email: user.email },
+      sessionId: this.sessionService.create(user.id),
     };
+  }
+
+  async me(userId: string): Promise<UserOutput> {
+    const user = await this.authRepository.findById(userId);
+
+    if (!user) {
+      throw new UserNotFoundError(userId);
+    }
+
+    return { id: user.id, name: user.name, email: user.email };
   }
 }
