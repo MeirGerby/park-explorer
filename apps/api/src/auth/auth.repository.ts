@@ -15,4 +15,19 @@ export class AuthRepository {
 
     return user ?? null;
   }
+
+  async create(
+    data: { name: string; email: string; passwordHash: string },
+    handlers: { onEmailTaken: () => never },
+  ) {
+    const existing = await this.findByEmail(data.email);
+
+    if (existing) {
+      handlers.onEmailTaken();
+    }
+
+    const [user] = await this.db.insert(users).values(data).returning();
+
+    return user;
+  }
 }
