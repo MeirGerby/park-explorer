@@ -32,6 +32,9 @@ interface SeedPark {
 const SEED_USER = {
   name: "Park Explorer Seed",
   email: "seed@park-explorer.local",
+  // Not a valid argon2 hash — this account is a placeholder FK target for
+  // seeded parks, not a real login. Login will always reject it.
+  passwordHash: "unusable-seed-placeholder",
 };
 
 const SEED_PARKS: SeedPark[] = [
