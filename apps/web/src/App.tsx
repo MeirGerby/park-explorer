@@ -1,7 +1,9 @@
+import { Routes, Route, Link } from "react-router-dom";
 import { AuthPage } from "./features/auth/components/AuthPage";
 import { useCurrentUser } from "./features/auth/hooks/use-current-user";
 import { RegionsSection } from "./features/regions/components/RegionsSection";
 import { ParksSection } from "./features/parks/components/ParksSection";
+import { ParkDetailPage } from "./features/parks/components/ParkDetailPage";
 
 function App() {
   const { data: user, isLoading, isError } = useCurrentUser();
@@ -17,12 +19,24 @@ function App() {
   return (
     <div>
       <header className="flex items-center justify-between border-b border-border p-4">
-        <h1 className="text-lg font-bold">Park Explorer</h1>
+        <Link to="/" className="text-lg font-bold">
+          Park Explorer
+        </Link>
         <p className="text-sm text-muted-foreground">Signed in as {user.name}</p>
       </header>
       <main className="mx-auto grid max-w-4xl gap-8 p-6">
-        <RegionsSection />
-        <ParksSection />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <RegionsSection />
+                <ParksSection />
+              </>
+            }
+          />
+          <Route path="/parks/:id" element={<ParkDetailPage />} />
+        </Routes>
       </main>
     </div>
   );
