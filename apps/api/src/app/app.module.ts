@@ -5,6 +5,9 @@ import { TRPCModule } from 'nestjs-trpc';
 import { HealthRouter } from './app.router.js';
 import { DatabaseModule } from '../database/database.module.js';
 import { ParksModule } from '../parks/parks.module.js';
+import { AuthModule } from '../auth/auth.module.js';
+import { AppContext } from '../auth/trpc-context.js';
+import { RegionsModule } from '../regions/regions.module.js';
 import { join } from 'node:path';
 
 @Module({
@@ -14,8 +17,10 @@ import { join } from 'node:path';
       envFilePath: join(__dirname, '../../../../.env'),
     }),
     DatabaseModule,
-    TRPCModule.forRoot({}),
+    TRPCModule.forRoot({ context: AppContext }),
     ParksModule,
+    AuthModule,
+    RegionsModule,
   ],
   controllers: [HealthRouter],
 })
