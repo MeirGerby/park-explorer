@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 
 import { trpc } from "@/lib/trpc"
 import { Input } from "@/components/ui/input"
@@ -98,14 +99,16 @@ export function ParkList() {
       {!isLoading && !isError && filteredParks && filteredParks.length > 0 && (
         <ul className="grid gap-4 sm:grid-cols-2">
           {filteredParks.map((park) => (
-            <li
-              key={park.id}
-              className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
-            >
-              <h3 className="text-lg font-semibold text-gray-900">{park.name}</h3>
-              <p className="mt-1 text-sm text-gray-600">
-                {park.cityName}, {park.regionName}
-              </p>
+            <li key={park.id}>
+              <Link
+                to={`/parks/${park.id}`}
+                className="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+              >
+                <h3 className="text-lg font-semibold text-gray-900">{park.name}</h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  {park.cityName}, {park.regionName}
+                </p>
+              </Link>
             </li>
           ))}
         </ul>
