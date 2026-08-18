@@ -1,28 +1,45 @@
-import { Button } from "@/components/ui/button"
-import { trpc } from "@/lib/trpc"
+import { Routes, Route, Link } from "react-router-dom";
+import { AuthPage } from "./features/auth/components/AuthPage";
+import { useCurrentUser } from "./features/auth/hooks/use-current-user";
+import { RegionsSection } from "./features/regions/components/RegionsSection";
+import { ParksSection } from "./features/parks/components/ParksSection";
+import { ParkDetailPage } from "./features/parks/components/ParkDetailPage";
 
 function App() {
-  const healthQuery = trpc.health.health.useQuery()
+  const { data: user, isLoading, isError } = useCurrentUser();
 
-  if (healthQuery.isLoading) {
-    return <div>Loading...</div>
+  if (isLoading) {
+    return <div className="p-4 text-gray-500">Loading...</div>;
   }
 
-  if (healthQuery.isError) {
-    return <div>Something went wrong</div>
+  if (isError || !user) {
+    return <AuthPage />;
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="text-2xl font-bold">Park Explorer</h1>
-
-      <p>
-        status: {healthQuery.data?.status}
-      </p>
-
-      <Button>Connected</Button>
-    </main>
-  )
+    <div>
+      <header className="flex items-center justify-between border-b border-border p-4">
+        <Link to="/" className="text-lg font-bold">
+          Park Explorer
+        </Link>
+        <p className="text-sm text-muted-foreground">Signed in as {user.name}</p>
+      </header>
+      <main className="mx-auto grid max-w-4xl gap-8 p-6">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <RegionsSection />
+                <ParksSection />
+              </>
+            }
+          />
+          <Route path="/parks/:id" element={<ParkDetailPage />} />
+        </Routes>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;

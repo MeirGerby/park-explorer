@@ -13,22 +13,51 @@ import { z } from "zod";
 
 const t = initTRPC.create();
 const publicProcedure = t.procedure;
-import type { HealthRouter } from "../health/health.router.js";
+import { loginInputSchema, userOutputSchema, registerInputSchema } from "../auth/dto/auth.dto.js";
+import { getParksInputSchema, parkListOutputSchema, getParkByIdInputSchema, parkDetailOutputSchema, createParkInputSchema } from "../parks/dto/park.dto.js";
+import { regionListOutputSchema, getRegionByIdInputSchema, regionDetailOutputSchema, createRegionInputSchema, regionOutputSchema } from "../regions/dto/region.dto.js";
 
 const appRouter = t.router({
-  health: t.router({
-    health: publicProcedure
-      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as unknown as Awaited<ReturnType<HealthRouter["health"]>>)
-  }),
-  users: t.router({
-    getUserById: publicProcedure
-      .input(z.object({ userId: z.string() }))
-      .output(z.object({
-        name: z.string(),
-        email: z.string()
-      }))
+  auth: t.router({
+    login: publicProcedure
+      .input(loginInputSchema)
+      .output(userOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    register: publicProcedure
+      .input(registerInputSchema)
+      .output(userOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    me: publicProcedure
+      .output(userOutputSchema)
       .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
-  })
+    }),
+  parks: t.router({
+    getParks: publicProcedure
+      .input(getParksInputSchema)
+      .output(parkListOutputSchema)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getParkById: publicProcedure
+      .input(getParkByIdInputSchema)
+      .output(parkDetailOutputSchema)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    createPark: publicProcedure
+      .input(createParkInputSchema)
+      .output(parkDetailOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+    }),
+  regions: t.router({
+    getRegions: publicProcedure
+      .output(regionListOutputSchema)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    getRegionById: publicProcedure
+      .input(getRegionByIdInputSchema)
+      .output(regionDetailOutputSchema)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    createRegion: publicProcedure
+      .input(createRegionInputSchema)
+      .output(regionOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+    })
 });
 
 export type AppRouter = typeof appRouter;
