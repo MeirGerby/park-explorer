@@ -22,7 +22,6 @@ function setSessionCookie(ctx: AppContextValue, sessionId: string): void {
   ctx.res.cookie(SESSION_COOKIE_NAME, sessionId, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
     maxAge: SESSION_TTL_MS,
   });
 }
