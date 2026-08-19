@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Router, Query, Mutation, Input, Ctx } from 'nestjs-trpc';
 import { TRPCError } from '@trpc/server';
 import {
@@ -17,9 +17,7 @@ import {
   type RegisterInput,
 } from './dto/auth.dto.js';
 
-// A plain function, not a method on AuthRouter — nestjs-trpc maps every
-// method on a @Router() class to a procedure, decorated or not, so a helper
-// like this would otherwise leak into the router as a phantom endpoint.
+
 function setSessionCookie(ctx: AppContextValue, sessionId: string): void {
   ctx.res.cookie(SESSION_COOKIE_NAME, sessionId, {
     httpOnly: true,
