@@ -89,4 +89,8 @@ export class AuthService {
 
     return { id: user.id, name: user.name, email: user.email };
   }
+
+  async logout(sessionId: string): Promise<void> {
+    await this.sessionService.destroy(sessionId);
+  }
 }

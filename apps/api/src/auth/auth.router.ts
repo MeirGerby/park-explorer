@@ -87,6 +87,22 @@ export class AuthRouter {
     }
   }
 
+  @Mutation()
+  async logout(@Ctx() ctx: AppContextValue) {
+    if (ctx.sessionId) {
+      await this.authService.logout(ctx.sessionId);
+    }
+
+    ctx.res.clearCookie(SESSION_COOKIE_NAME, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+
+    return {
+      success: true,
+    };
+  }
   @Query({
     output: userOutputSchema,
   })

@@ -1,5 +1,6 @@
 import { Routes, Route, Link } from "react-router-dom";
 import { AuthPage } from "./features/auth/components/AuthPage";
+import { LogoutButton } from "./features/auth/components/LogoutButton";
 import { useCurrentUser } from "./features/auth/hooks/use-current-user";
 import { RegionsSection } from "./features/regions/components/RegionsSection";
 import { ParksSection } from "./features/parks/components/ParksSection";
@@ -22,7 +23,10 @@ function App() {
         <Link to="/" className="text-lg font-bold">
           Park Explorer
         </Link>
-        <p className="text-sm text-muted-foreground">Signed in as {user.name}</p>
+        <div className="flex items-center gap-4">
+          <p className="text-sm text-muted-foreground">Signed in as {user.name}</p>
+          <LogoutButton />
+        </div>
       </header>
       <main className="mx-auto grid max-w-4xl gap-8 p-6">
         <Routes>
