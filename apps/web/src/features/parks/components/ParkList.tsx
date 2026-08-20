@@ -1,21 +1,21 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
-import { trpc } from "@/lib/trpc"
-import { Input } from "@/components/ui/input"
-import { Select } from "@/components/ui/select"
-import { Field, FieldLabel } from "@/components/ui/field"
+import { trpc } from "@/lib/trpc";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Field, FieldLabel } from "@/components/ui/field";
 
 export function ParkList() {
-  const [search, setSearch] = useState("")
-  const [regionId, setRegionId] = useState("")
-  const [cityId, setCityId] = useState("")
+  const [search, setSearch] = useState("");
+  const [regionId, setRegionId] = useState("");
+  const [cityId, setCityId] = useState("");
 
-  const { data: regions } = trpc.regions.getRegions.useQuery()
+  const { data: regions } = trpc.regions.getRegions.useQuery();
   const { data: region } = trpc.regions.getRegionById.useQuery(
     { id: regionId },
-    { enabled: regionId !== "" }
-  )
+    { enabled: regionId !== "" },
+  );
 
   const {
     data: parks,
@@ -25,11 +25,15 @@ export function ParkList() {
   } = trpc.parks.getParks.useQuery({
     regionId: regionId || undefined,
     cityId: cityId || undefined,
-  })
+  });
 
   const filteredParks = parks?.filter((park) =>
-    park.name.toLowerCase().includes(search.trim().toLowerCase())
-  )
+    park.name.toLowerCase().includes(search.trim().toLowerCase()),
+  );
+
+  const handleInputChange = (t: React.ChangeEvent<HTMLInputElement>): void => {
+    setSearch(t.target.value);
+  };
 
   return (
     <div className="grid gap-4">
@@ -40,19 +44,22 @@ export function ParkList() {
             type="text"
             placeholder="Search parks..."
             value={search}
-            onValueChange={setSearch}
+            onChange={handleInputChange}
           />
         </Field>
         <div className="grid gap-1.5">
-          <label htmlFor="park-filter-region" className="text-sm leading-none font-medium">
+          <label
+            htmlFor="park-filter-region"
+            className="text-sm leading-none font-medium"
+          >
             Region
           </label>
           <Select
             id="park-filter-region"
             value={regionId}
             onChange={(event) => {
-              setRegionId(event.target.value)
-              setCityId("")
+              setRegionId(event.target.value);
+              setCityId("");
             }}
           >
             <option value="">All regions</option>
@@ -64,7 +71,10 @@ export function ParkList() {
           </Select>
         </div>
         <div className="grid gap-1.5">
-          <label htmlFor="park-filter-city" className="text-sm leading-none font-medium">
+          <label
+            htmlFor="park-filter-city"
+            className="text-sm leading-none font-medium"
+          >
             City
           </label>
           <Select
@@ -73,7 +83,9 @@ export function ParkList() {
             value={cityId}
             onChange={(event) => setCityId(event.target.value)}
           >
-            <option value="">{regionId ? "All cities" : "Select a region first"}</option>
+            <option value="">
+              {regionId ? "All cities" : "Select a region first"}
+            </option>
             {region?.cities.map((city) => (
               <option key={city.id} value={city.id}>
                 {city.name}
@@ -92,9 +104,12 @@ export function ParkList() {
         </div>
       )}
 
-      {!isLoading && !isError && filteredParks && filteredParks.length === 0 && (
-        <div className="p-4 text-gray-500">No parks found.</div>
-      )}
+      {!isLoading &&
+        !isError &&
+        filteredParks &&
+        filteredParks.length === 0 && (
+          <div className="p-4 text-gray-500">No parks found.</div>
+        )}
 
       {!isLoading && !isError && filteredParks && filteredParks.length > 0 && (
         <ul className="grid gap-4 sm:grid-cols-2">
@@ -104,7 +119,9 @@ export function ParkList() {
                 to={`/parks/${park.id}`}
                 className="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
               >
-                <h3 className="text-lg font-semibold text-gray-900">{park.name}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {park.name}
+                </h3>
                 <p className="mt-1 text-sm text-gray-600">
                   {park.cityName}, {park.regionName}
                 </p>
@@ -114,5 +131,5 @@ export function ParkList() {
         </ul>
       )}
     </div>
-  )
+  );
 }
