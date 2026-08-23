@@ -60,8 +60,6 @@ export function HomePage() {
             View all →
           </Link>
         </div>
-
-        <ParkList />
       </section>
 
       <section>
@@ -84,7 +82,7 @@ export function HomePage() {
           </Link>
         </div>
 
-        <RegionList />
+        {/* <RegionList /> */}
       </section>
     </div>
   )
