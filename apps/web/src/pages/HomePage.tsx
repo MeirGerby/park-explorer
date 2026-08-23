@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 
-import { ParkList } from "@/features/parks/components/ParkList"
-import { RegionList } from "@/features/regions/components/RegionList"
+// import { ParkList } from "@/features/parks/components/ParkList"
+// import { RegionList } from "@/features/regions/components/RegionList"
 
 export function HomePage() {
   return (

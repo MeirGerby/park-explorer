@@ -8,7 +8,7 @@ import { AppShell } from "@/components/layout/AppShell"
 import { HomePage } from "@/pages/HomePage"
 import { ParksPage } from "@/pages/ParksPage"
 import { RegionsPage } from "@/pages/RegainsPage"
-import { ParkDetailPage } from "@/features/parks/components/ParkDetailPage"
+import { ParkDetailPage } from "@/pages/ParkDetailPage"
 
 export function Router() {
   const { data: user, isLoading, isError } = useCurrentUser()
