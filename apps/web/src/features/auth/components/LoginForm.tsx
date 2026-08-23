@@ -30,7 +30,7 @@ export function LoginForm() {
           required
           autoComplete="email"
           value={email}
-          onValueChange={setEmail}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </Field>
       <Field>
@@ -40,7 +40,7 @@ export function LoginForm() {
           required
           autoComplete="current-password"
           value={password}
-          onValueChange={setPassword}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </Field>
       {login.isError && (

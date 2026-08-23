@@ -31,7 +31,7 @@ export function RegisterForm() {
           required
           autoComplete="name"
           value={name}
-          onValueChange={setName}
+          onChange={(e) => setName(e.target.value)}
         />
       </Field>
       <Field>
@@ -41,7 +41,7 @@ export function RegisterForm() {
           required
           autoComplete="email"
           value={email}
-          onValueChange={setEmail}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </Field>
       <Field>
@@ -52,7 +52,7 @@ export function RegisterForm() {
           minLength={8}
           autoComplete="new-password"
           value={password}
-          onValueChange={setPassword}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </Field>
       {register.isError && (

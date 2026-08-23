@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { trpc, trpcClient } from "@/lib/trpc";
 import { queryClient } from "@/lib/query-client";
 import "./index.css";
-import App from "./App.tsx";
+import App from "./app/App.tsx";
 
 const AppProvider = trpc.Provider;
 
