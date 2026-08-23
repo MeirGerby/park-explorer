@@ -16,6 +16,7 @@ const publicProcedure = t.procedure;
 import { loginInputSchema, userOutputSchema, registerInputSchema } from "../auth/dto/auth.dto.js";
 import { getParksInputSchema, parkListOutputSchema, getParkByIdInputSchema, parkDetailOutputSchema, createParkInputSchema } from "../parks/dto/park.dto.js";
 import { regionListOutputSchema, getRegionByIdInputSchema, regionDetailOutputSchema, createRegionInputSchema, regionOutputSchema } from "../regions/dto/region.dto.js";
+import type { AuthRouter } from "../auth/auth.router.js";
 
 const appRouter = t.router({
   auth: t.router({
@@ -29,7 +30,9 @@ const appRouter = t.router({
       .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
     me: publicProcedure
       .output(userOutputSchema)
-      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
+      .query(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    logout: publicProcedure
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as unknown as Awaited<ReturnType<AuthRouter["logout"]>>)
     }),
   parks: t.router({
     getParks: publicProcedure

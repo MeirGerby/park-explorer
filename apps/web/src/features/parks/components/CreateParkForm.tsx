@@ -51,11 +51,11 @@ export function CreateParkForm() {
     <form onSubmit={handleSubmit} className="grid gap-4">
       <Field>
         <FieldLabel>Name</FieldLabel>
-        <Input type="text" required value={name} onValueChange={setName} />
+        <Input type="text" required value={name} onChange={(e) => setName(e.target.value)} />
       </Field>
       <Field>
         <FieldLabel>Description</FieldLabel>
-        <Input type="text" value={description} onValueChange={setDescription} />
+        <Input type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
       </Field>
       <div className="grid grid-cols-2 gap-4">
         <div className="grid gap-1.5">
