@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom"
 
-// import { ParkList } from "@/features/parks/components/ParkList"
-// import { RegionList } from "@/features/regions/components/RegionList"
 
 export function HomePage() {
   return (
@@ -81,8 +79,6 @@ export function HomePage() {
             View all →
           </Link>
         </div>
-
-        {/* <RegionList /> */}
       </section>
     </div>
   )
