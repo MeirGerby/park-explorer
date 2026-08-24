@@ -5,10 +5,9 @@ import { useParkFilters } from "../hooks/use-park-filter";
 
 interface ParkListProps {
   limit?: number;
-  className?: string;
 }
 
-export function ParkList({ limit, className }: ParkListProps) {
+export function ParkList({ limit }: ParkListProps) {
   const filters = useParkFilters();
 
   // Avoid running filters if used inside a limited context
