@@ -54,7 +54,6 @@ export function HomePage() {
         </div>
         <ParkList
           limit={3}
-          className="text-xs [&_h3]:text-sm [&_p]:text-xs [&_div]:p-3"
         />
       </section>
 
