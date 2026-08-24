@@ -7,8 +7,10 @@ import { AppShell } from "@/components/layout/AppShell"
 
 import { HomePage } from "@/pages/HomePage"
 import { ParksPage } from "@/pages/ParksPage"
-import { RegionsPage } from "@/pages/RegainsPage"
+import { AddParkPage } from "@/pages/AddParkPage"
 import { ParkDetailPage } from "@/pages/ParkDetailPage"
+import { RegionsPage } from "@/pages/RegainsPage"
+import { AddRegionPage } from "@/pages/AddRegionPage"
 
 export function Router() {
   const { data: user, isLoading, isError } = useCurrentUser()
@@ -16,8 +18,8 @@ export function Router() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">
-          Loading...
+        <p className="text-sm text-muted-foreground animate-pulse">
+          Loading layout...
         </p>
       </div>
     )
@@ -28,13 +30,24 @@ export function Router() {
   }
 
   return (
-    <AppShell userName={user.name}>
-      <Routes>
+    <Routes>
+      {/* AppShell acts as the layout wrapper for all protected routes */}
+      <Route element={<AppShell userName={user.name} />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/parks" element={<ParksPage />} />
-        <Route path="/parks/:id" element={<ParkDetailPage />} />
-        <Route path="/regions" element={<RegionsPage />} />
-      </Routes>
-    </AppShell>
+        
+        {/* Parks Feature Tree */}
+        <Route path="parks">
+          <Route index element={<ParksPage />} />
+          <Route path="new" element={<AddParkPage />} />
+          <Route path=":id" element={<ParkDetailPage />} />
+        </Route>
+
+        {/* Regions Feature Tree */}
+        <Route path="regions">
+          <Route index element={<RegionsPage />} />
+          <Route path="new" element={<AddRegionPage />} />
+        </Route>
+      </Route>
+    </Routes>
   )
 }

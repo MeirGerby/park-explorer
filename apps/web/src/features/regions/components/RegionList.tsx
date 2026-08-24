@@ -1,38 +1,37 @@
 import { trpc } from "@/lib/trpc"
 
-export function RegionList() {
-  const {
-    data: regions,
-    isLoading,
-    isError,
-    error,
-  } = trpc.regions.getRegions.useQuery()
+interface RegionListProps {
+  limit?: number
+}
 
-  if (isLoading) {
-    return <div className="p-4 text-gray-500">Loading regions...</div>
-  }
+export function RegionList({ limit }: RegionListProps) {
+  const { data: regions, isLoading, isError, error } = trpc.regions.getRegions.useQuery()
+
+  if (isLoading) return <div className="p-4 text-muted-foreground text-sm">Loading regions...</div>
 
   if (isError) {
     return (
-      <div className="rounded-md border border-red-200 bg-red-50 p-4 text-red-600">
+      <div className="rounded-md border border-destructive/20 bg-destructive/5 p-4 text-destructive text-sm">
         <p className="font-semibold">Error loading regions</p>
-        <p className="text-sm">{error.message}</p>
+        <p className="text-xs">{error.message}</p>
       </div>
     )
   }
 
   if (!regions || regions.length === 0) {
-    return <div className="p-4 text-gray-500">No regions found.</div>
+    return <div className="p-4 text-muted-foreground text-sm">No regions found.</div>
   }
 
+  const displayedRegions = limit ? regions.slice(0, limit) : regions
+
   return (
-    <ul className="grid gap-4 sm:grid-cols-2">
-      {regions.map((region) => (
+    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {displayedRegions.map((region) => (
         <li
           key={region.id}
-          className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+          className="rounded-xl border bg-card p-4 text-card-foreground shadow-sm transition-all hover:shadow-md"
         >
-          <h3 className="text-lg font-semibold text-gray-900">{region.name}</h3>
+          <h3 className="font-semibold tracking-tight text-foreground">{region.name}</h3>
         </li>
       ))}
     </ul>
