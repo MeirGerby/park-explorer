@@ -18,7 +18,6 @@ export function RegionsPage() {
         </p>
       </section>
 
-      <RegionList />
 
       <details className="group rounded-xl border bg-card">
         <summary className="cursor-pointer list-none p-6">
@@ -43,6 +42,7 @@ export function RegionsPage() {
           <CreateRegionForm />
         </div>
       </details>
+      <RegionList />
     </div>
   )
 }
