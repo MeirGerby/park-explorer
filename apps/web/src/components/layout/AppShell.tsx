@@ -1,23 +1,19 @@
-import type { ReactNode } from "react"
-
+import { Outlet } from "react-router-dom"
 import { Header } from "./Header"
 import { PageContainer } from "./PageContainer"
 
 type AppShellProps = {
   userName: string
-  children: ReactNode
 }
 
-export function AppShell({
-  userName,
-  children,
-}: AppShellProps) {
+export function AppShell({ userName }: AppShellProps) {
   return (
     <div className="min-h-screen bg-background">
       <Header userName={userName} />
 
       <PageContainer>
-        {children}
+        {/* Outlet acts as a placeholder for nested route components */}
+        <Outlet />
       </PageContainer>
     </div>
   )

@@ -1,48 +1,29 @@
-import { CreateRegionForm } from "@/features/regions/components/CreateRegionForm"
+import { Link } from "react-router-dom"
 import { RegionList } from "@/features/regions/components/RegionList"
 
 export function RegionsPage() {
   return (
-    <div className="grid gap-8">
-      <section>
-        <p className="text-sm font-semibold text-primary">
-          Explore
-        </p>
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <section>
+          <p className="text-sm font-semibold text-primary">Explore</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight">Regions</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Browse regions and discover the parks within them.
+          </p>
+        </section>
 
-        <h1 className="mt-2 text-3xl font-bold tracking-tight">
-          Regions
-        </h1>
+        <Link
+          to="/regions/new"
+          className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/95"
+        >
+          + Add New Region
+        </Link>
+      </div>
 
-        <p className="mt-2 max-w-2xl text-muted-foreground">
-          Browse regions and discover the parks within them.
-        </p>
-      </section>
-
-
-      <details className="group rounded-xl border bg-card">
-        <summary className="cursor-pointer list-none p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-semibold">
-                Add a new region
-              </h2>
-
-              <p className="mt-1 text-sm text-muted-foreground">
-                Create a region to organize cities and parks.
-              </p>
-            </div>
-
-            <span className="text-xl text-muted-foreground transition-transform group-open:rotate-45">
-              +
-            </span>
-          </div>
-        </summary>
-
-        <div className="border-t p-6">
-          <CreateRegionForm />
-        </div>
-      </details>
-      <RegionList />
+      <div className="rounded-xl border bg-card p-6 shadow-sm">
+        <RegionList />
+      </div>
     </div>
   )
 }
