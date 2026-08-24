@@ -18,7 +18,6 @@ export function ParksPage() {
         </p>
       </section>
 
-      <ParkList />
 
       <details className="group rounded-xl border bg-card">
         <summary className="cursor-pointer list-none p-6">
@@ -43,6 +42,8 @@ export function ParksPage() {
           <CreateParkForm />
         </div>
       </details>
+
+      <ParkList />
     </div>
   )
 }
