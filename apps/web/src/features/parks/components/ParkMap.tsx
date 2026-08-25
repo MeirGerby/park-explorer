@@ -4,6 +4,7 @@ import {
 } from "react-leaflet"
 
 import { ParkMapMarker } from "./ParkMapMarker"
+import { ParkMapViewport } from "./ParkMapViewport"
 
 import "leaflet/dist/leaflet.css"
 
@@ -32,12 +33,14 @@ export function ParkMap({
       center={DEFAULT_CENTER}
       zoom={8}
       scrollWheelZoom
-      className="h-125 w-full"
+      className="h-125 w-full rounded-xl"
     >
       <TileLayer
         attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
+      <ParkMapViewport parks={parks} />
 
       {parks.map((park) => (
         <ParkMapMarker

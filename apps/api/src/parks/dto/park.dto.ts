@@ -8,7 +8,7 @@ const locationTupleSchema = z.unknown().transform((val): [number, number] => {
     return [Number((val as any).x), Number((val as any).y)];
   }
   if (typeof val === "object" && val !== null && "lng" in val && "lat" in val) {
-    return [Number((val as any).lng), Number((val as any).lat)];
+    return [Number((val as any).lat), Number((val as any).lng)];
   }
   return [0, 0];
 });

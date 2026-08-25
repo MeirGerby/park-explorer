@@ -1,47 +1,59 @@
 import { Link } from "react-router-dom"
-import {
-  Marker,
-  Polygon,
-  Popup,
-} from "react-leaflet"
+// Make sure 'polygon' function is NOT imported from "leaflet" here
+import { Marker, Polygon, Popup } from "react-leaflet"
+import L from "leaflet"
 
-import { isLatLng } from "@/features/parks/lib/park-location"
+import { normalizeLatLng } from "@/features/parks/lib/park-location"
 import { parseParkPolygon } from "@/features/parks/lib/park-polygon"
+
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
+import markerIcon from "leaflet/dist/images/marker-icon.png"
+import markerShadow from "leaflet/dist/images/marker-shadow.png"
+
+const defaultIcon = L.icon({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+})
 
 type ParkMapMarkerProps = {
   park: {
     id: string
     name: string
     cityName: string
-    location: [number, number]
-    polygon: string | null
+    location: unknown
+    polygon: unknown
   }
 }
 
-export function ParkMapMarker({
-  park,
-}: ParkMapMarkerProps) {
-  if (!isLatLng(park.location)) {
+export function ParkMapMarker({ park }: ParkMapMarkerProps) {
+  const position = normalizeLatLng(park.location)
+
+  if (!position) {
     return null
   }
 
-  const polygon = parseParkPolygon(
-    park.polygon,
-  )
+  // Rename variable to 'polygonPositions' to prevent shadowing
+  const polygonPositions = parseParkPolygon(park.polygon)
 
   return (
     <>
-      <Marker position={park.location}>
+      {polygonPositions && (
+        <Polygon
+          positions={polygonPositions}
+          pathOptions={{ color: "#3388ff", weight: 2, fillOpacity: 0.2 }}
+        />
+      )}
+
+      <Marker position={position} icon={defaultIcon}>
         <Popup>
           <div className="grid gap-1">
-            <p className="font-semibold">
-              {park.name}
-            </p>
-
-            <p className="text-sm">
-              {park.cityName}
-            </p>
-
+            <p className="font-semibold">{park.name}</p>
+            <p className="text-sm">{park.cityName}</p>
             <Link
               to={`/parks/${park.id}`}
               className="text-sm text-primary hover:underline"
@@ -51,10 +63,6 @@ export function ParkMapMarker({
           </div>
         </Popup>
       </Marker>
-
-      {polygon && (
-        <Polygon positions={polygon} />
-      )}
     </>
   )
 }

@@ -1,15 +1,38 @@
 import { Link } from "react-router-dom";
 
 import { trpc } from "@/lib/trpc";
-import { isLatLng } from "@/features/parks/lib/park-location";
 import { ParkMap } from "@/features/parks/components/ParkMap";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function HomePage() {
   const { data: parks, isLoading } = trpc.parks.getParks.useQuery({});
 
-  const parksWithLocation =
-    parks?.filter((park) => isLatLng(park.location)) ?? [];
+  // Ensure locations are normalized to [number, number] tuple format
+  const mappedParks =
+  parks?.map((park) => {
+    let location: [number, number] = [0, 0];
+    const loc = park.location as unknown;
+
+    if (Array.isArray(loc) && loc.length === 2) {
+      location = [Number(loc[0]), Number(loc[1])];
+    } else if (typeof loc === "object" && loc !== null) {
+      const obj = loc as Record<string, unknown>;
+      if ("lat" in obj && "lng" in obj) {
+        location = [Number(obj.lat), Number(obj.lng)];
+      } else if ("x" in obj && "y" in obj) {
+        location = [Number(obj.x), Number(obj.y)];
+      }
+    }
+
+    return {
+      ...park,
+      location,
+    };
+  }) ?? [];
+
+  const validParksForMap = mappedParks.filter(
+    (p) => p.location[0] !== 0 || p.location[1] !== 0
+  );
 
   const parkCount = parks?.length ?? 0;
 
@@ -69,7 +92,7 @@ export function HomePage() {
           </CardHeader>
 
           <CardContent>
-            <p className="text-3xl font-bold">{parksWithLocation.length}</p>
+            <p className="text-3xl font-bold">{validParksForMap.length}</p>
           </CardContent>
         </Card>
 
@@ -105,7 +128,7 @@ export function HomePage() {
           {isLoading ? (
             <div className="h-125 animate-pulse bg-muted" />
           ) : (
-            <ParkMap parks={parksWithLocation} />
+            <ParkMap parks={validParksForMap} />
           )}
         </div>
       </section>
