@@ -1,81 +1,152 @@
 import { Link } from "react-router-dom";
-import { ParkList } from "@/features/parks/components/ParkList";
-import { RegionList } from "@/features/regions/components/RegionList";
+
+import { trpc } from "@/lib/trpc";
+import { isLatLng } from "@/features/parks/lib/park-location";
+import { ParkMap } from "@/features/parks/components/ParkMap";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function HomePage() {
+  const { data: parks, isLoading } = trpc.parks.getParks.useQuery({});
+
+  const parksWithLocation =
+    parks?.filter((park) => isLatLng(park.location)) ?? [];
+
+  const parkCount = parks?.length ?? 0;
+
   return (
-    <div className="space-y-12">
-      <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-        <div className="p-8 sm:p-12">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold text-primary">Park Explorer</p>
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Explore the parks around you.
-            </h1>
-            <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-              Discover parks, cities and regions, and find your next place to
-              explore.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/parks"
-                className="rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
-              >
-                Explore parks
-              </Link>
-              <Link
-                to="/regions"
-                className="rounded-md border bg-background px-5 py-2.5 text-sm font-medium shadow-sm transition-colors hover:bg-muted"
-              >
-                Browse regions
-              </Link>
+    <div className="grid gap-8">
+      {/* Hero */}
+      <section className="rounded-2xl border bg-card p-8 shadow-sm">
+        <div className="max-w-2xl">
+          <p className="text-sm font-medium text-primary">Park Explorer</p>
+
+          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+            Explore parks around you
+          </h1>
+
+          <p className="mt-3 text-muted-foreground">
+            Discover parks, explore their locations, and learn more about the
+            places around you.
+          </p>
+
+          <div className="mt-6 flex gap-3">
+            <Link
+              to="/parks"
+              className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors hover:bg-primary/90"
+            >
+              Explore parks
+            </Link>
+
+            <Link
+              to="/regions"
+              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              Browse regions
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="grid gap-4 sm:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Parks
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <p className="text-3xl font-bold">{parkCount}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Parks on map
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <p className="text-3xl font-bold">{parksWithLocation.length}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Regions
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <Link
+              to="/regions"
+              className="text-sm text-primary hover:underline"
+            >
+              Explore regions →
+            </Link>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Map */}
+      <section className="grid gap-4">
+        <div>
+          <h2 className="text-xl font-semibold">Explore the map</h2>
+
+          <p className="text-sm text-muted-foreground">
+            Select a park to view more information.
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border shadow-sm">
+          {isLoading ? (
+            <div className="h-125 animate-pulse bg-muted" />
+          ) : (
+            <ParkMap parks={parksWithLocation} />
+          )}
+        </div>
+      </section>
+
+      {/* Recent parks */}
+      {!isLoading && parks && parks.length > 0 && (
+        <section className="grid gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Parks</h2>
+
+              <p className="text-sm text-muted-foreground">
+                Explore the available parks.
+              </p>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Embedded Dashboard Previews */}
-      <section className="space-y-4">
-        <div className="flex items-end justify-between border-b pb-4">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">
-              Recent Parks
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Discover parks currently available.
-            </p>
+            <Link
+              to="/parks"
+              className="inline-flex h-9 items-center justify-center rounded-md px-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              View all →
+            </Link>
           </div>
-          <Link
-            to="/parks"
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            View all parks →
-          </Link>
-        </div>
-        <ParkList
-          limit={3}
-        />
-      </section>
 
-      <section className="space-y-4">
-        <div className="flex items-end justify-between border-b pb-4">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">
-              Active Regions
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Explore local geographic systems.
-            </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {parks.slice(0, 6).map((park) => (
+              <Link
+                key={park.id}
+                to={`/parks/${park.id}`}
+                className="rounded-xl border bg-card p-5 transition-shadow hover:shadow-md"
+              >
+                <h3 className="font-semibold">{park.name}</h3>
+
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {park.cityName}, {park.regionName}
+                </p>
+              </Link>
+            ))}
           </div>
-          <Link
-            to="/regions"
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            View all regions →
-          </Link>
-        </div>
-        <RegionList limit={3} />
-      </section>
+        </section>
+      )}
     </div>
   );
 }
