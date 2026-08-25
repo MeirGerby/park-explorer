@@ -114,11 +114,9 @@ export class ParksRepository {
         .values({
           name: data.name,
           description: data.description,
+          geometry: data.geometry,
           creatorId: data.creatorId,
-          openedAt: data.openedAt,
           cityId: data.cityId,
-          location: data.location,
-          polygon: data.polygon,
         })
         .returning();
 
@@ -143,9 +141,6 @@ export class ParksRepository {
         id: park.id,
         name: park.name,
         description: park.description,
-        openedAt: park.openedAt,
-        location: park.location,
-        polygon: park.polygon,
         cityName: location.cityName,
         regionName: location.regionName,
         images,
