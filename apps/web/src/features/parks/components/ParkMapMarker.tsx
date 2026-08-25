@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom"
 import {
   Marker,
+  Polygon,
   Popup,
 } from "react-leaflet"
 
 import { isLatLng } from "@/features/parks/lib/park-location"
+import { parseParkPolygon } from "@/features/parks/lib/park-polygon"
 
 type ParkMapMarkerProps = {
   park: {
@@ -22,6 +24,10 @@ export function ParkMapMarker({
   if (!isLatLng(park.location)) {
     return null
   }
+
+  const polygon = parseParkPolygon(
+    park.polygon,
+  )
 
   return (
     <>
@@ -45,6 +51,10 @@ export function ParkMapMarker({
           </div>
         </Popup>
       </Marker>
+
+      {polygon && (
+        <Polygon positions={polygon} />
+      )}
     </>
   )
 }
