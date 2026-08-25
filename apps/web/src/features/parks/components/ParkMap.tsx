@@ -1,22 +1,23 @@
-import { Link } from "react-router-dom"
 import {
   MapContainer,
-  Marker,
-  Popup,
   TileLayer,
 } from "react-leaflet"
 
-import { isLatLng } from "@/features/parks/lib/park-location"
+import { ParkMapMarker } from "./ParkMapMarker"
+import { ParkMapViewport } from "./ParkMapViewport"
 
 import "leaflet/dist/leaflet.css"
 
+type Park = {
+  id: string
+  name: string
+  cityName: string
+  location: [number, number]
+  polygon: string | null
+}
+
 type ParkMapProps = {
-  parks: Array<{
-    id: string
-    name: string
-    cityName: string
-    location: unknown
-  }>
+  parks: Park[]
 }
 
 const DEFAULT_CENTER: [number, number] = [
@@ -32,47 +33,21 @@ export function ParkMap({
       center={DEFAULT_CENTER}
       zoom={8}
       scrollWheelZoom
-      className="h-125 w-full"
+      className="h-125 w-full rounded-xl"
     >
       <TileLayer
         attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {parks.map((park) => {
-        if (!isLatLng(park.location)) {
-          return null
-        }
+      <ParkMapViewport parks={parks} />
 
-        return (
-          <Marker
-            key={park.id}
-            position={[
-              park.location.lat,
-              park.location.lng,
-            ]}
-          >
-            <Popup>
-              <div className="grid gap-1">
-                <p className="font-semibold">
-                  {park.name}
-                </p>
-
-                <p className="text-sm text-muted-foreground">
-                  {park.cityName}
-                </p>
-
-                <Link
-                  to={`/parks/${park.id}`}
-                  className="text-sm text-primary hover:underline"
-                >
-                  View park →
-                </Link>
-              </div>
-            </Popup>
-          </Marker>
-        )
-      })}
+      {parks.map((park) => (
+        <ParkMapMarker
+          key={park.id}
+          park={park}
+        />
+      ))}
     </MapContainer>
   )
 }
