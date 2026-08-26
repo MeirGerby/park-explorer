@@ -20,8 +20,7 @@ export function AddParkPage() {
       </div>
 
       <div className="rounded-xl border bg-card p-6 shadow-sm">
-        {/* <CreateParkForm onSuccess={() => navigate("/parks")} /> */}
-        <CreateParkForm />
+        <CreateParkForm onSuccess={() => navigate("/parks")} />
       </div>
     </div>
   )

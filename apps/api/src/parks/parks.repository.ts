@@ -37,16 +37,17 @@ export class ParksRepository {
       params?.cityId ? eq(parks.cityId, params.cityId) : undefined,
       params?.regionId ? eq(regions.id, params.regionId) : undefined,
     ].filter(
-      (filter): filter is NonNullable<typeof filter> =>
-        filter !== undefined,
+      (filter): filter is NonNullable<typeof filter> => filter !== undefined,
     );
 
-    return this.db
+    const result = await this.db
       .select(parkSelection)
       .from(parks)
       .innerJoin(cities, eq(parks.cityId, cities.id))
       .innerJoin(regions, eq(cities.regionId, regions.id))
       .where(filters.length > 0 ? and(...filters) : undefined);
+
+    return result as unknown as ParkOutput[];
   }
 
   async findById(id: string): Promise<ParkDetailOutput | null> {
@@ -74,7 +75,7 @@ export class ParksRepository {
     return {
       ...park,
       images,
-    };
+    } as unknown as ParkDetailOutput;
   }
 
   async create(
@@ -109,16 +110,23 @@ export class ParksRepository {
         handlers.onCreatorNotFound();
       }
 
+      // חילוץ/יצירת גיאומטריה ו-ID במידה והם נדרשים ב-Schema בסיס הנתונים
+      const generatedId = crypto.randomUUID();
+      const geometry =
+        typeof data.polygon === 'string'
+          ? data.polygon
+          : JSON.stringify(data.polygon ?? {});
+
       const [park] = await tx
         .insert(parks)
         .values({
           name: data.name,
           description: data.description,
-          creatorId: data.creatorId,
           openedAt: data.openedAt,
           cityId: data.cityId,
           location: data.location,
           polygon: data.polygon,
+          creatorId: data.creatorId,
         })
         .returning();
 
@@ -149,7 +157,7 @@ export class ParksRepository {
         cityName: location.cityName,
         regionName: location.regionName,
         images,
-      };
+      } as unknown as ParkDetailOutput;
     });
   }
 }
