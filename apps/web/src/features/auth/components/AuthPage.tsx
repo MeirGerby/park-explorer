@@ -24,7 +24,7 @@ export function AuthPage() {
       </div>
 
       {/* 2. Topo-style Subtle Micro Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#000000_1px,transparent_1px),linear-gradient(to_bottom,#000000_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_60%,transparent_100%)] opacity-[0.03] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#000000_1px,transparent_1px),linear-gradient(to_bottom,#000000_1px,transparent_1px)] bg-size-[3rem_3rem] mask-[radial-gradient(ellipse_80%_80%_at_50%_50%,#000_70%,transparent_100%)] opacity-[0.03] pointer-events-none" />
 
       {/* 3. Main Warm Glass Card */}
       <div className="relative z-10 w-full max-w-105 transition-all duration-300">
