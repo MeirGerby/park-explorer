@@ -11,6 +11,7 @@ import { AddParkPage } from "@/pages/AddParkPage"
 import { ParkDetailPage } from "@/pages/ParkDetailPage"
 import { RegionsPage } from "@/pages/RegainsPage"
 import { AddRegionPage } from "@/pages/AddRegionPage"
+import { ParkMapPage } from "@/pages/ParkMapPage"
 
 export function Router() {
   const { data: user, isLoading, isError } = useCurrentUser()
@@ -39,6 +40,7 @@ export function Router() {
         <Route path="parks">
           <Route index element={<ParksPage />} />
           <Route path="new" element={<AddParkPage />} />
+          <Route path=":id/map" element={<ParkMapPage />} />
           <Route path=":id" element={<ParkDetailPage />} />
         </Route>
 

@@ -1,18 +1,32 @@
 import { z } from 'zod';
 
+const locationTupleSchema = z.unknown().transform((val): [number, number] => {
+  if (Array.isArray(val) && val.length === 2) {
+    return [Number(val[0]), Number(val[1])];
+  }
+  if (typeof val === "object" && val !== null && "x" in val && "y" in val) {
+    return [Number((val as any).x), Number((val as any).y)];
+  }
+  if (typeof val === "object" && val !== null && "lng" in val && "lat" in val) {
+    return [Number((val as any).lat), Number((val as any).lng)];
+  }
+  return [0, 0];
+});
+
 export const parkImageOutputSchema = z.object({
   id: z.uuid(),
   url: z.url(),
   caption: z.string().nullable(),
 });
 
+
 export const parkOutputSchema = z.object({
   id: z.uuid(),
   name: z.string(),
   description: z.string().nullable(),
-  openedAt: z.date().nullable(),
-  location: z.unknown().nullable(),
-  polygon: z.unknown().nullable(),
+  openedAt: z.union([z.date(), z.string()]).nullable(),
+  location: locationTupleSchema,
+  polygon: z.unknown().transform((val) => (typeof val === "string" ? val : val ? JSON.stringify(val) : null)),
   cityName: z.string(),
   regionName: z.string(),
 });
