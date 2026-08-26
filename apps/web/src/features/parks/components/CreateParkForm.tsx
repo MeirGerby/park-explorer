@@ -19,7 +19,7 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
   const [description, setDescription] = useState("");
   const [regionId, setRegionId] = useState("");
   const [cityId, setCityId] = useState("");
-  const [openingDate, setOpeningDate] = useState("");
+  const [openedAt, setOpenedAt] = useState("");
 
   const { data: regions } = trpc.regions.getRegions.useQuery();
   const { data: region } = trpc.regions.getRegionById.useQuery(
@@ -33,6 +33,7 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
       setName("");
       setDescription("");
       setRegionId("");
+      setOpenedAt("");
       setCityId("");
       onSuccess?.();
     },
@@ -50,6 +51,7 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
       description: description || undefined,
       cityId,
       creatorId: user.id,
+      openedAt,
     });
   }
 
@@ -128,8 +130,8 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
             <Input
               type="date"
               required
-              value={openingDate}
-              onChange={(e) => setOpeningDate(e.target.value)}
+              value={openedAt}
+              onChange={(e) => setOpenedAt(e.target.value)}
             />
           </Field>
       </div>
