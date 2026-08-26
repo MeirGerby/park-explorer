@@ -60,12 +60,24 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
       return;
     }
 
+    if (pickerType === "point" && !location) {
+      alert("Please select a location on the map.");
+      return;
+    }
+
+    if (pickerType === "polygon" && (!polygon || polygon.length < 3)) {
+      alert("Please select at least 3 points to define an area.");
+      return;
+    }
+
     createPark.mutate({
       name,
       description: description || undefined,
       cityId,
       creatorId: user.id,
       openedAt,
+      location: pickerType === "point" ? location : undefined,
+      polygon: pickerType === "polygon" ? polygon : undefined,
     });
   }
 
