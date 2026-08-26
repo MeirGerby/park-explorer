@@ -4,8 +4,16 @@ import type {
   GetParksInput,
   ParkDetailOutput,
   ParkOutput,
+  UpdateParkInput,
 } from './dto/park.dto.js';
 import { ParksRepository } from './parks.repository.js';
+
+export class ParkNotFoundError extends Error {
+  constructor(public readonly parkId: string) {
+    super(`Park with ID '${parkId}' was not found.`);
+    this.name = 'ParkNotFoundError';
+  }
+}
 
 export class ParkCityNotFoundError extends Error {
   constructor(public readonly cityId: string) {
@@ -23,9 +31,7 @@ export class ParkCreatorNotFoundError extends Error {
 
 @Injectable()
 export class ParksService {
-  constructor(
-    private readonly parksRepository: ParksRepository,
-  ) {}
+  constructor(private readonly parksRepository: ParksRepository) {}
 
   async findAll(params?: GetParksInput): Promise<ParkOutput[]> {
     return this.parksRepository.findAll(params);
@@ -44,5 +50,23 @@ export class ParksService {
         throw new ParkCreatorNotFoundError(data.creatorId);
       },
     });
+  }
+
+  async update(
+    id: string,
+    data: UpdateParkInput,
+  ): Promise<ParkDetailOutput | null> {
+    return this.parksRepository.update(id, data, {
+      onParkNotFound: () => {
+        throw new ParkNotFoundError(id);
+      },
+      onCityNotFound: () => {
+        throw new ParkCityNotFoundError(data.cityId ?? '');
+      },
+    });
+  }
+
+  async remove(id: string): Promise<{ success: boolean }> {
+    return this.parksRepository.remove(id);
   }
 }

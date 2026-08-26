@@ -15,6 +15,7 @@ import type {
   GetParksInput,
   ParkDetailOutput,
   ParkOutput,
+  UpdateParkInput
 } from './dto/park.dto.js';
 
 const parkSelection = {
@@ -110,12 +111,6 @@ export class ParksRepository {
         handlers.onCreatorNotFound();
       }
 
-      const generatedId = crypto.randomUUID();
-      const geometry =
-        typeof data.polygon === 'string'
-          ? data.polygon
-          : JSON.stringify(data.polygon ?? {});
-
       const [park] = await tx
         .insert(parks)
         .values({
@@ -158,5 +153,106 @@ export class ParksRepository {
         images,
       } as unknown as ParkDetailOutput;
     });
+  }
+  async update(
+    id: string,
+    data: UpdateParkInput,
+    handlers: {
+      onParkNotFound: () => never;
+      onCityNotFound: () => never;
+    },
+  ): Promise<ParkDetailOutput> {
+    return this.db.transaction(async (tx) => {
+      const [existingPark] = await tx
+        .select({ id: parks.id, cityId: parks.cityId })
+        .from(parks)
+        .where(eq(parks.id, id))
+        .limit(1);
+
+      if (!existingPark) {
+        handlers.onParkNotFound();
+      }
+
+      const tragetCityId = data.cityId ?? existingPark.cityId;
+      const [location] = await tx
+        .select({
+          cityName: cities.name,
+          regionName: regions.name,
+        })
+        .from(cities)
+        .innerJoin(regions, eq(cities.regionId, regions.id))
+        .where(eq(cities.id, tragetCityId))
+        .limit(1);
+
+      if (!location) {
+        handlers.onCityNotFound();
+      }
+
+      const [updatedPark] = await tx
+        .update(parks)
+        .set({
+          name: data.name,
+          description: data.description,
+          openedAt: data.openedAt,
+          cityId: data.cityId,
+          location: data.location,
+          polygon: data.polygon,
+        })
+        .where(eq(parks.id, id))
+        .returning();
+
+      let images = await tx
+        .select({
+          id: parkImages.id,
+          url: parkImages.url,
+          caption: parkImages.caption,
+        })
+        .from(parkImages)
+        .where(eq(parkImages.parkId, id));
+
+      if (data.images !== undefined) {
+        await tx.delete(parkImages).where(eq(parkImages.parkId, id));
+
+        images = data.images.length
+          ? await tx
+              .insert(parkImages)
+              .values(
+                data.images.map((image) => ({
+                  url: image.url,
+                  caption: image.caption,
+                  parkId: id,
+                })),
+              )
+              .returning({
+                id: parkImages.id,
+                url: parkImages.url,
+                caption: parkImages.caption,
+              })
+          : [];
+      }
+
+      return {
+        id: updatedPark.id,
+        name: updatedPark.name,
+        description: updatedPark.description,
+        openedAt: updatedPark.openedAt,
+        location: updatedPark.location,
+        polygon: updatedPark.polygon,
+        cityName: location.cityName,
+        regionName: location.regionName,
+        images,
+      } as unknown as ParkDetailOutput;
+    });
+  }
+
+  async remove(id: string): Promise<{ success: boolean }> {
+    await this.db.delete(parkImages).where(eq(parkImages.parkId, id));
+
+    const result = await this.db
+      .delete(parks)
+      .where(eq(parks.id, id))
+      .returning({ id: parks.id });
+
+    return { success: result.length > 0 };
   }
 }
