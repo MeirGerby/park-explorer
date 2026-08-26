@@ -110,7 +110,6 @@ export class ParksRepository {
         handlers.onCreatorNotFound();
       }
 
-      // חילוץ/יצירת גיאומטריה ו-ID במידה והם נדרשים ב-Schema בסיס הנתונים
       const generatedId = crypto.randomUUID();
       const geometry =
         typeof data.polygon === 'string'
