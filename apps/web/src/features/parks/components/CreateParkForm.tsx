@@ -1,47 +1,48 @@
-import { useState, type SubmitEvent } from "react"
+import { useState, type SubmitEvent } from "react";
 
-import { trpc } from "@/lib/trpc"
-import { useCurrentUser } from "@/features/auth/hooks/use-current-user"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select } from "@/components/ui/select"
-import { Field, FieldLabel } from "@/components/ui/field"
+import { trpc } from "@/lib/trpc";
+import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Field, FieldLabel } from "@/components/ui/field";
 
 interface CreateParkFormProps {
-  onSuccess?: () => void
+  onSuccess?: () => void;
 }
 
 export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
-  const { data: user } = useCurrentUser()
-  const utils = trpc.useUtils()
+  const { data: user } = useCurrentUser();
+  const utils = trpc.useUtils();
 
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [regionId, setRegionId] = useState("")
-  const [cityId, setCityId] = useState("")
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [regionId, setRegionId] = useState("");
+  const [cityId, setCityId] = useState("");
+  const [openingDate, setOpeningDate] = useState("");
 
-  const { data: regions } = trpc.regions.getRegions.useQuery()
+  const { data: regions } = trpc.regions.getRegions.useQuery();
   const { data: region } = trpc.regions.getRegionById.useQuery(
     { id: regionId },
-    { enabled: regionId !== "" }
-  )
+    { enabled: regionId !== "" },
+  );
 
   const createPark = trpc.parks.createPark.useMutation({
     onSuccess: () => {
-      utils.parks.getParks.invalidate()
-      setName("")
-      setDescription("")
-      setRegionId("")
-      setCityId("")
-      onSuccess?.()
+      utils.parks.getParks.invalidate();
+      setName("");
+      setDescription("");
+      setRegionId("");
+      setCityId("");
+      onSuccess?.();
     },
-  })
+  });
 
   function handleSubmit(event: SubmitEvent) {
-    event.preventDefault()
+    event.preventDefault();
 
     if (!user || !cityId) {
-      return
+      return;
     }
 
     createPark.mutate({
@@ -49,22 +50,34 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
       description: description || undefined,
       cityId,
       creatorId: user.id,
-    })
+    });
   }
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
       <Field>
         <FieldLabel>Name</FieldLabel>
-        <Input type="text" required value={name} onChange={(e) => setName(e.target.value)} />
+        <Input
+          type="text"
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       </Field>
       <Field>
         <FieldLabel>Description</FieldLabel>
-        <Input type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
+        <Input
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
       </Field>
       <div className="grid grid-cols-2 gap-4">
         <div className="grid gap-1.5">
-          <label htmlFor="park-region" className="text-sm leading-none font-medium">
+          <label
+            htmlFor="park-region"
+            className="text-sm leading-none font-medium"
+          >
             Region
           </label>
           <Select
@@ -72,8 +85,8 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
             required
             value={regionId}
             onChange={(event) => {
-              setRegionId(event.target.value)
-              setCityId("")
+              setRegionId(event.target.value);
+              setCityId("");
             }}
           >
             <option value="" disabled>
@@ -87,7 +100,10 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
           </Select>
         </div>
         <div className="grid gap-1.5">
-          <label htmlFor="park-city" className="text-sm leading-none font-medium">
+          <label
+            htmlFor="park-city"
+            className="text-sm leading-none font-medium"
+          >
             City
           </label>
           <Select
@@ -107,6 +123,15 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
             ))}
           </Select>
         </div>
+          <Field>
+            <FieldLabel>Opening Date</FieldLabel>
+            <Input
+              type="date"
+              required
+              value={openingDate}
+              onChange={(e) => setOpeningDate(e.target.value)}
+            />
+          </Field>
       </div>
       {createPark.isError && (
         <p className="text-sm text-destructive">{createPark.error.message}</p>
@@ -115,5 +140,5 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
         {createPark.isPending ? "Creating..." : "Create park"}
       </Button>
     </form>
-  )
+  );
 }
