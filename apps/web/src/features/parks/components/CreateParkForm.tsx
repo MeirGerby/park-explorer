@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from "react"
+import { useState, type SubmitEvent } from "react"
 
 import { trpc } from "@/lib/trpc"
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user"
@@ -37,7 +37,7 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
     },
   })
 
-  function handleSubmit(event: ChangeEvent) {
+  function handleSubmit(event: SubmitEvent) {
     event.preventDefault()
 
     if (!user || !cityId) {
