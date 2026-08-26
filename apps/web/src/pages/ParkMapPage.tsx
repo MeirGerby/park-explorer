@@ -29,14 +29,14 @@ export function ParkMapPage() {
       </div>
 
       {/* 2. Topo-style Subtle Micro Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#000000_1px,transparent_1px),linear-gradient(to_bottom,#000000_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,#000_70%,transparent_100%)] opacity-[0.025] pointer-events-none -z-10" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#000000_1px,transparent_1px),linear-gradient(to_bottom,#000000_1px,transparent_1px)] bg-size-[3rem_3rem] mask-[radial-gradient(ellipse_80%_80%_at_50%_50%,#000_70%,transparent_100%)] opacity-[0.025] pointer-events-none -z-10" />
 
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Loading State */}
         {isLoading && (
           <div className="space-y-6">
             <div className="h-28 rounded-3xl border border-stone-200/80 bg-stone-50/80 backdrop-blur-2xl animate-pulse ring-1 ring-white/60" />
-            <div className="h-[500px] rounded-3xl border border-stone-200/80 bg-stone-50/80 backdrop-blur-2xl animate-pulse ring-1 ring-white/60" />
+            <div className="h-125 rounded-3xl border border-stone-200/80 bg-stone-50/80 backdrop-blur-2xl animate-pulse ring-1 ring-white/60" />
           </div>
         )}
 
