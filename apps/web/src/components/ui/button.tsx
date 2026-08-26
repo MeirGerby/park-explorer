@@ -1,5 +1,6 @@
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -40,18 +41,40 @@ const buttonVariants = cva(
   }
 )
 
+// הוספת הטיפוס asChild לממשק הפרופס הפנימי של הכפתור
+export interface ButtonProps extends ButtonPrimitive.Props {
+  asChild?: boolean;
+}
+
 function Button({
   className,
   variant = "default",
   size = "default",
+  asChild = false, // קבלת הפרופ
+  children,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonProps & VariantProps<typeof buttonVariants>) {
+  
+  // במידה ו-asChild הוא אמת, נשתמש במנגנון ה-render של Base UI כדי להעביר את הכל לרכיב הילד (ה-Link)
+  if (asChild && React.isValidElement(children)) {
+    return (
+      <ButtonPrimitive
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        render={children} // מעביר את כל ה-props והעיצוב ישירות לתוך ה-Link
+        {...props}
+      />
+    );
+  }
+
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
-    />
+    >
+      {children}
+    </ButtonPrimitive>
   )
 }
 
