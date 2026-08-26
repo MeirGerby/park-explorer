@@ -7,7 +7,11 @@ import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Field, FieldLabel } from "@/components/ui/field"
 
-export function CreateParkForm() {
+interface CreateParkFormProps {
+  onSuccess?: () => void
+}
+
+export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
   const { data: user } = useCurrentUser()
   const utils = trpc.useUtils()
 
@@ -29,6 +33,7 @@ export function CreateParkForm() {
       setDescription("")
       setRegionId("")
       setCityId("")
+      onSuccess?.()
     },
   })
 
