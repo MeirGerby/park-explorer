@@ -70,7 +70,7 @@ export function ParkMapPage() {
       </div>
 
       <Map
-        center={[park.location.lat, park.location.lng]}
+        center={[park.location[0], park.location[1]]}
         zoom={15}
       />
     </div>
