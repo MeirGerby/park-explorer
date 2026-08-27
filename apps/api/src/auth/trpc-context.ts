@@ -7,6 +7,7 @@ export interface AppContextValue extends Record<string, unknown> {
   req: CreateExpressContextOptions['req'];
   res: CreateExpressContextOptions['res'];
   user: { id: string } | null;
+  sessionId: string | null;
 }
 
 @Injectable()
@@ -21,6 +22,7 @@ export class AppContext implements TRPCContext {
       req: opts.req,
       res: opts.res,
       user: session ? { id: session.userId } : null,
+      sessionId: sessionId ?? null
     };
   }
 }

@@ -9,10 +9,6 @@ interface Session {
   expiresAt: number;
 }
 
-// In-memory session store. Deliberately kept behind create/get/destroy so it
-// can be swapped for a Redis-backed implementation later without touching
-// any caller. Sessions are lost on server restart and won't work across
-// multiple processes — acceptable for local dev, not for production.
 @Injectable()
 export class SessionService {
   private readonly sessions = new Map<string, Session>();

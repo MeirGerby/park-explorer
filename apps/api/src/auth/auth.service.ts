@@ -25,10 +25,7 @@ export class UserNotFoundError extends Error {
   }
 }
 
-// A precomputed argon2 hash with no matching plaintext password. Verifying
-// against it when the email isn't found keeps login's response time roughly
-// constant, so timing can't be used to tell "unknown email" apart from
-// "wrong password" and enumerate registered accounts.
+
 const DUMMY_PASSWORD_HASH =
   '$argon2id$v=19$m=65536,p=4,t=3$nLTxinLslvuuggseiIbVdw$jNAObRq+JOTk+paEBRXs11IzPVkpYGKa1W5XDhpNfFQ';
 
@@ -88,5 +85,9 @@ export class AuthService {
     }
 
     return { id: user.id, name: user.name, email: user.email };
+  }
+
+  async logout(sessionId: string): Promise<void> {
+    this.sessionService.destroy(sessionId);
   }
 }

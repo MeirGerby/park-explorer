@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Logger } from '@nestjs/common';
+=======
+import {   Logger } from '@nestjs/common';
+>>>>>>> f6d68e0fda557c83ea1a7a825d9e00eb0d80d3a7
 import { Router, Query, Mutation, Input, Ctx } from 'nestjs-trpc';
 import { TRPCError } from '@trpc/server';
 import {
@@ -24,6 +28,10 @@ function setSessionCookie(ctx: AppContextValue, sessionId: string): void {
     sameSite: 'lax',
     maxAge: SESSION_TTL_MS,
   });
+}
+
+function clearSessionCookie(ctx: AppContextValue): void {
+  ctx.res.clearCookie(SESSION_COOKIE_NAME);
 }
 
 @Router({ alias: 'auth' })
@@ -109,6 +117,25 @@ export class AuthRouter {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'An unexpected error occurred while fetching the current user.',
+        cause: error,
+      });
+    }
+  }
+
+  @Mutation()
+  async logout(@Ctx() ctx: AppContextValue) {
+    try {
+      if (ctx.sessionId) {
+        await this.authService.logout(ctx.sessionId);
+      }
+
+      clearSessionCookie(ctx);
+      return { success: true };
+    } catch (error) {
+      this.logger.error('Failed to log out', error);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred while logging out.',
         cause: error,
       });
     }

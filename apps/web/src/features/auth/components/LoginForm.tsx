@@ -1,4 +1,5 @@
 import { useState, type BaseSyntheticEvent } from "react"
+import { useNavigate } from 'react-router-dom'
 
 import { trpc } from "@/lib/trpc"
 import { Button } from "@/components/ui/button"
@@ -9,10 +10,12 @@ export function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const utils = trpc.useUtils()
+  const navigate = useNavigate()
 
   const login = trpc.auth.login.useMutation({
-    onSuccess: () => {
-      utils.auth.me.invalidate()
+    onSuccess: async () => {
+      await utils.auth.me.invalidate()
+      navigate("/")
     },
   })
 
@@ -30,7 +33,7 @@ export function LoginForm() {
           required
           autoComplete="email"
           value={email}
-          onValueChange={setEmail}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </Field>
       <Field>
@@ -40,7 +43,7 @@ export function LoginForm() {
           required
           autoComplete="current-password"
           value={password}
-          onValueChange={setPassword}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </Field>
       {login.isError && (
