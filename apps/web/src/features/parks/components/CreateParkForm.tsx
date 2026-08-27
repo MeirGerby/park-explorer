@@ -33,6 +33,10 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
   const [location, setLocation] = useState<[number, number] | null>(null);
   const [polygon, setPolygon] = useState<Array<[number, number]> | null>(null);
 
+  const [images, setImages] = useState<Array<{url: string; caption?: string}>>([]);
+  const [imageUrl, setImageUrl] = useState("")
+  const [imageCaption, setImageCaption] = useState("")
+
   const { data: regions } = trpc.regions.getRegions.useQuery();
   const { data: region } = trpc.regions.getRegionById.useQuery(
     { id: regionId },
@@ -49,9 +53,23 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
       setCityId("");
       setLocation(null);
       setPolygon(null);
+      setImages([]);
+      setImageUrl("");
+      setImageCaption("");
       onSuccess?.();
     },
   });
+
+  function handleAddImage() {
+    if (!imageUrl.trim()) return; 
+    setImages((prev) => [...prev, {url: imageUrl.trim(), caption: imageCaption.trim() || undefined}])
+    setImageUrl("")
+    setImageCaption("");
+  }
+
+  function handleRemoveImage(index: number) {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  }
 
   function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
@@ -78,6 +96,7 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
       openedAt,
       location: pickerType === "point" ? location : undefined,
       polygon: pickerType === "polygon" ? polygon : undefined,
+      images: images.length > 0 ? images : undefined,
     });
   }
 
@@ -168,6 +187,55 @@ export function CreateParkForm({ onSuccess }: CreateParkFormProps) {
               />
             </Field>
           </div>
+        </div>
+
+        {/* IMAGES SECTION */}
+        <div className="grid gap-2 border p-3 rounded-lg">
+          <label className="text-sm leading-none font-medium">Images</label>
+          <div className="grid grid-cols-1 gap-2">
+            <Input 
+              type="url"
+              placeholder="Image URL"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
+            <Input 
+              type="text"
+              placeholder="Caption (optional)"
+              value={imageCaption}
+              onChange={(e) => setImageCaption(e.target.value)}
+            />
+            <Button 
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAddImage}
+              disabled={!imageUrl.trim()}
+            > 
+              Add Image 
+            </Button>
+          </div>
+
+          {images.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {images.map((img, index) => (
+                <li key={index} className="flex justify-between items-center text-sm p-1 border rounded">
+                  <span className="truncate max-w-50">
+                    {img.caption ? `${img.caption} (${img.url})`: img.url}
+                  </span>
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-6 text-xs text-destructive"
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    Remove
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {createPark.isError && (
