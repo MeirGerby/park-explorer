@@ -21,4 +21,8 @@ export function LogoutButton() {
       {logout.isPending ? "Signing out..." : "Log out"}
     </Button>
   )
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> a7e59a1dffbfef515fbce1b990c2322ce546ea25

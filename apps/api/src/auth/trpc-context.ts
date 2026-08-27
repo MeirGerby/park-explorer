@@ -23,7 +23,11 @@ export class AppContext implements TRPCContext {
       req: opts.req,
       res: opts.res,
       user: session ? { id: session.userId } : null,
+<<<<<<< HEAD
       sessionId: sessionId ?? null,
+=======
+      sessionId: sessionId ?? null
+>>>>>>> a7e59a1dffbfef515fbce1b990c2322ce546ea25
     };
   }
 }
