@@ -1,16 +1,28 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Router, Query, Mutation, Input } from 'nestjs-trpc';
 import { TRPCError } from '@trpc/server';
-import { ParkCityNotFoundError, ParkCreatorNotFoundError, ParksService } from './parks.service.js';
+import {
+  ParkCityNotFoundError,
+  ParkCreatorNotFoundError,
+  ParkNotFoundError,
+  ParksService,
+} from './parks.service.js';
 import {
   createParkInputSchema,
   getParkByIdInputSchema,
   getParksInputSchema,
   parkDetailOutputSchema,
   parkListOutputSchema,
+  updateParkInputSchema,
   type CreateParkInput,
   type GetParksInput,
 } from './dto/park.dto.js';
+import z from 'zod';
+
+export const updateParkPayloadSchema = z.object({
+  id: z.uuid(),
+  data: updateParkInputSchema,
+});
 
 @Router({ alias: 'parks' })
 export class ParksRouter {
@@ -73,7 +85,10 @@ export class ParksRouter {
     try {
       return await this.parksService.create(data);
     } catch (error) {
-      if (error instanceof ParkCityNotFoundError || error instanceof ParkCreatorNotFoundError) {
+      if (
+        error instanceof ParkCityNotFoundError ||
+        error instanceof ParkCreatorNotFoundError
+      ) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: error.message,
@@ -84,6 +99,64 @@ export class ParksRouter {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'An unexpected error occurred while creating the park.',
+        cause: error,
+      });
+    }
+  }
+
+  @Mutation({
+    input: updateParkPayloadSchema,
+    output: parkDetailOutputSchema,
+  })
+  async updatePark(@Input() payload: z.infer<typeof updateParkPayloadSchema>) {
+    try {
+      return await this.parksService.update(payload.id, payload.data);
+    } catch (error) {
+      if (error instanceof ParkNotFoundError) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: error.message,
+        });
+      }
+
+      if (error instanceof ParkCityNotFoundError) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: error.message });
+      }
+
+      this.logger.error(`Failed to update park with ID ${payload.id}`, error);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred while updating the park.',
+        cause: error,
+      });
+    }
+  }
+
+  @Mutation({
+    input: getParkByIdInputSchema,
+    output: z.object({ success: z.boolean() }),
+  })
+  async removePark(@Input('id') id: string) {
+    try {
+      const result = await this.parksService.remove(id);
+
+      if (!result.success) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `Park with ID '${id}' was not found or could not be deleted`,
+        });
+      }
+
+      return result;
+    } catch (error) {
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+
+      this.logger.error(`Failed to remove park with ID $id`, error);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred while deleting the park.',
         cause: error,
       });
     }

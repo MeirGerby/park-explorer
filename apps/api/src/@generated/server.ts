@@ -15,6 +15,7 @@ const t = initTRPC.create();
 const publicProcedure = t.procedure;
 import { loginInputSchema, userOutputSchema, registerInputSchema } from "../auth/dto/auth.dto.js";
 import { getParksInputSchema, parkListOutputSchema, getParkByIdInputSchema, parkDetailOutputSchema, createParkInputSchema } from "../parks/dto/park.dto.js";
+import { updateParkPayloadSchema } from "../parks/parks.router.js";
 import { regionListOutputSchema, getRegionByIdInputSchema, regionDetailOutputSchema, createRegionInputSchema, regionOutputSchema } from "../regions/dto/region.dto.js";
 import type { AuthRouter } from "../auth/auth.router.js";
 
@@ -46,6 +47,14 @@ const appRouter = t.router({
     createPark: publicProcedure
       .input(createParkInputSchema)
       .output(parkDetailOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    updatePark: publicProcedure
+      .input(updateParkPayloadSchema)
+      .output(parkDetailOutputSchema)
+      .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any),
+    removePark: publicProcedure
+      .input(getParkByIdInputSchema)
+      .output(z.object({ success: z.boolean() }))
       .mutation(async () => "PLACEHOLDER_DO_NOT_REMOVE" as any)
     }),
   regions: t.router({

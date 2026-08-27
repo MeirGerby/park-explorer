@@ -12,6 +12,7 @@ import { ParkDetailPage } from "@/pages/ParkDetailPage"
 import { RegionsPage } from "@/pages/RegainsPage"
 import { AddRegionPage } from "@/pages/AddRegionPage"
 import { ParkMapPage } from "@/pages/ParkMapPage"
+import { ParkEditPage } from "@/pages/ParkEditPage"
 
 export function Router() {
   const { data: user, isLoading, isError } = useCurrentUser()
@@ -42,6 +43,7 @@ export function Router() {
           <Route path="new" element={<AddParkPage />} />
           <Route path=":id/map" element={<ParkMapPage />} />
           <Route path=":id" element={<ParkDetailPage />} />
+          <Route path="/parks/:id/edit" element={<ParkEditPage />} />
         </Route>
 
         {/* Regions Feature Tree */}
