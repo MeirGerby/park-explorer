@@ -43,7 +43,7 @@ export function Router() {
           <Route path="new" element={<AddParkPage />} />
           <Route path=":id/map" element={<ParkMapPage />} />
           <Route path=":id" element={<ParkDetailPage />} />
-          <Route path="/parks/:id/edit" element={<ParkEditPage />} />
+          <Route path=":id/edit" element={<ParkEditPage />} />
         </Route>
 
         {/* Regions Feature Tree */}
