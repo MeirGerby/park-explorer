@@ -1,5 +1,3 @@
-import { type LatLngExpression } from "leaflet"
-
 export function isLatLng(location: unknown): location is [number, number] {
   if (!location) return false
 
