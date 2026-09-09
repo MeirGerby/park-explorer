@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { migrate } from "drizzle-orm/neon-serverless/migrator";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { getDatabaseConnection } from "./client.js";
 import * as dotenv from 'dotenv';
 import * as path from 'path';

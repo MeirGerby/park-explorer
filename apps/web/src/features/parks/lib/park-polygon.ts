@@ -1,11 +1,9 @@
-import { type LatLngExpression } from "leaflet";
-
-function parseWKT(wkt: string): LatLngExpression[] | null {
+function parseWKT(wkt: string): [number, number][] | null {
   const match = wkt.match(/POLYGON\s*\(\((.*?)\)\)/i);
   if (!match || !match[1]) return null;
 
   const pairs = match[1].split(",");
-  const coords: LatLngExpression[] = [];
+  const coords: [number, number][] = [];
 
   for (const pair of pairs) {
     const parts = pair.trim().split(/\s+/);
@@ -21,7 +19,7 @@ function parseWKT(wkt: string): LatLngExpression[] | null {
   return coords.length > 0 ? coords : null;
 }
 
-export function parseParkPolygon(polygon: unknown): LatLngExpression[] | null {
+export function parseParkPolygon(polygon: unknown): [number, number][] | null {
   if (!polygon) return null;
 
   let parsed: any = polygon;
@@ -44,12 +42,12 @@ export function parseParkPolygon(polygon: unknown): LatLngExpression[] | null {
   // 2. Process GeoJSON Object ({ type: "Polygon", coordinates: [...] })
   if (parsed && typeof parsed === "object" && parsed.type === "Polygon" && Array.isArray(parsed.coordinates)) {
     const ring = parsed.coordinates[0];
-    return ring.map(([lng, lat]: [number, number]) => [lat, lng]);
+    return ring.map(([lng, lat]: [number, number]): [number, number] => [lat, lng]);
   }
 
   // 3. Process Array format ([[lng, lat], ...] or [{lat, lng}, ...])
   if (Array.isArray(parsed)) {
-    return parsed.map((item) => {
+    return parsed.map((item): [number, number] => {
       if (Array.isArray(item)) return [item[1], item[0]];
       return [item.lat, item.lng];
     });

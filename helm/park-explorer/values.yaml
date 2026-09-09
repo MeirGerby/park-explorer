@@ -1,0 +1,77 @@
+# Default values for park-explorer.
+# Targets OpenShift: no fixed runAsUser/fsGroup is set anywhere (the cluster's
+# restricted SCC assigns those), and images are chosen to run correctly under
+# an arbitrary non-root UID (nginx-unprivileged, the sclorg postgresql image).
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Container images for the two app images built from the repo's Dockerfiles
+# (Dockerfile.api, Dockerfile.web). Point `registry` at wherever you pushed
+# them — e.g. OpenShift's internal registry:
+#   image-registry.openshift-image-registry.svc:5000/<your-project>
+image:
+  registry: ""
+  api:
+    repository: park-explorer-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  web:
+    repository: park-explorer-web
+    tag: latest
+    pullPolicy: IfNotPresent
+
+api:
+  replicaCount: 1
+  containerPort: 3000
+  # Only relevant if something calls the api directly, bypassing the web
+  # nginx proxy (see web.nginx below) — the deployed browser traffic never
+  # hits this cross-origin, since nginx proxies /trpc internally.
+  corsOrigin: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+web:
+  replicaCount: 1
+  containerPort: 8080
+
+postgresql:
+  image:
+    # sclorg's PostgreSQL image: built to run under an arbitrary UID (group
+    # 0), which the official postgres image is not. On a subscribed OpenShift
+    # cluster you can swap this for registry.redhat.io/rhel9/postgresql-16.
+    repository: quay.io/sclorg/postgresql-16-c9s
+    tag: latest
+    pullPolicy: IfNotPresent
+  auth:
+    user: park_explorer
+    database: park_explorer
+    # Leave empty to auto-generate a random password on first install; it is
+    # then read back from the existing Secret on every subsequent `helm
+    # upgrade` so it never rotates underneath a running database.
+    password: ""
+  persistence:
+    size: 1Gi
+    # Empty uses the cluster's default StorageClass.
+    storageClassName: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+route:
+  enabled: true
+  # Leave empty to let OpenShift assign the default <name>-<namespace>.<router-subdomain> host.
+  host: ""
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

@@ -1,4 +1,4 @@
-import {   Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Router, Query, Mutation, Input, Ctx } from 'nestjs-trpc';
 import { TRPCError } from '@trpc/server';
 import {
@@ -17,12 +17,10 @@ import {
   type RegisterInput,
 } from './dto/auth.dto.js';
 
-
 function setSessionCookie(ctx: AppContextValue, sessionId: string): void {
   ctx.res.cookie(SESSION_COOKIE_NAME, sessionId, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
     maxAge: SESSION_TTL_MS,
   });
 }
@@ -129,7 +127,8 @@ export class AuthRouter {
       this.logger.error('Failed to fetch current user', error);
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'An unexpected error occurred while fetching the current user.',
+        message:
+          'An unexpected error occurred while fetching the current user.',
         cause: error,
       });
     }

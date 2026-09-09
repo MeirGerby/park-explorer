@@ -1,0 +1,21 @@
+Park Explorer has been deployed as release "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
+
+{{- if .Values.route.enabled }}
+
+Check the Route host:
+  oc get route {{ include "park-explorer.webServiceName" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.host}'
+{{- else }}
+
+route.enabled is false — expose the web Service yourself (oc expose svc/{{ include "park-explorer.webServiceName" . }}, or a port-forward for local testing):
+  oc port-forward svc/{{ include "park-explorer.webServiceName" . }} 8080:{{ .Values.web.containerPort }}
+{{- end }}
+
+Migrations run automatically as an initContainer on each api pod before it starts serving — no separate step needed. To check on them:
+  oc logs deploy/{{ include "park-explorer.apiServiceName" . }} -c migrate
+
+To seed sample data (optional, safe to re-run):
+  oc exec deploy/{{ include "park-explorer.apiServiceName" . }} -- sh -c \
+    "cd /app/packages/db && node_modules/.bin/tsx src/seed/index.ts"
+
+Postgres credentials (and a ready DATABASE_URL) live in the Secret:
+  oc get secret {{ include "park-explorer.postgresSecretName" . }} -n {{ .Release.Namespace }} -o jsonpath='{.data.postgres-password}' | base64 -d

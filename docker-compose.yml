@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: park_explorer
+      POSTGRES_PASSWORD: park_explorer
+      POSTGRES_DB: park_explorer
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U park_explorer -d park_explorer']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    working_dir: /app/packages/db
+    command: ['node_modules/.bin/tsx', 'src/migrate.ts']
+    environment:
+      DATABASE_URL: postgresql://park_explorer:park_explorer@postgres:5432/park_explorer
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://park_explorer:park_explorer@postgres:5432/park_explorer
+      PORT: 3000
+      CORS_ORIGIN: http://localhost:8080
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        VITE_API_URL: /trpc
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
