@@ -21,14 +21,5 @@
   "engines": {
     "node": ">=18"
   },
-  "devEngines": {
-    "packageManager": {
-      "name": "npm",
-      "version": "^11.11.1"
-    }
-  },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "packageManager": "pnpm@11.23.0"
 }
