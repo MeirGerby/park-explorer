@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "park-explorer.webServiceName" . }}
+  labels:
+    {{- include "park-explorer.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+spec:
+  replicas: {{ .Values.web.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "park-explorer.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: web
+  template:
+    metadata:
+      labels:
+        {{- include "park-explorer.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: web
+      annotations:
+        # Forces a rollout when the proxied api service name changes.
+        checksum/nginx-config: {{ include (print $.Template.BasePath "/web-configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: web
+          image: {{ include "park-explorer.image" (dict "root" . "component" .Values.image.web) }}
+          imagePullPolicy: {{ .Values.image.web.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.web.containerPort }}
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+          securityContext:
+            {{- include "park-explorer.containerSecurityContext" . | nindent 12 }}
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ include "park-explorer.webServiceName" . }}-nginx

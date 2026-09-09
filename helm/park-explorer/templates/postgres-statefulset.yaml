@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "park-explorer.fullname" . }}-postgresql
+  labels:
+    {{- include "park-explorer.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgresql
+spec:
+  serviceName: {{ include "park-explorer.postgresServiceName" . }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "park-explorer.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: postgresql
+  template:
+    metadata:
+      labels:
+        {{- include "park-explorer.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: postgresql
+    spec:
+      # No fixed runAsUser/fsGroup here — OpenShift's restricted SCC assigns
+      # both automatically for the namespace. The sclorg image is built to
+      # initialize and run PGDATA correctly under whatever UID it's given.
+      containers:
+        - name: postgresql
+          # Not routed through the shared image.registry prefix (unlike api/web
+          # below): this repository is already a fully-qualified external
+          # registry path (quay.io/... or registry.redhat.io/...), independent
+          # of wherever you push the app images.
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          ports:
+            - name: postgresql
+              containerPort: 5432
+          env:
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "park-explorer.postgresSecretName" . }}
+                  key: postgres-user
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "park-explorer.postgresSecretName" . }}
+                  key: postgres-password
+            - name: POSTGRESQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "park-explorer.postgresSecretName" . }}
+                  key: postgres-database
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/pgsql/data
+          livenessProbe:
+            exec:
+              command: ['/usr/libexec/check-container', '--live']
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command: ['/usr/libexec/check-container']
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          securityContext:
+            {{- include "park-explorer.containerSecurityContext" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "park-explorer.labels" . | nindent 10 }}
+          app.kubernetes.io/component: postgresql
+      spec:
+        accessModes: ['ReadWriteOnce']
+        {{- if .Values.postgresql.persistence.storageClassName }}
+        storageClassName: {{ .Values.postgresql.persistence.storageClassName }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.postgresql.persistence.size }}

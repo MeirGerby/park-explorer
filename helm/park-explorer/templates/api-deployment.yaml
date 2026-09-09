@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "park-explorer.apiServiceName" . }}
+  labels:
+    {{- include "park-explorer.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "park-explorer.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        {{- include "park-explorer.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: api
+    spec:
+      # Runs migrations before the api starts serving. This is a normal
+      # container failure/retry, not a Helm hook: if postgres isn't reachable
+      # yet, tsx exits non-zero and kubelet retries with backoff until the
+      # StatefulSet pod is up — no explicit "wait for postgres" step needed.
+      # Same script as `pnpm --filter @park-explorer/db db:migrate` locally.
+      initContainers:
+        - name: migrate
+          image: {{ include "park-explorer.image" (dict "root" . "component" .Values.image.api) }}
+          imagePullPolicy: {{ .Values.image.api.pullPolicy }}
+          workingDir: /app/packages/db
+          command: ['node_modules/.bin/tsx', 'src/migrate.ts']
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "park-explorer.postgresSecretName" . }}
+                  key: database-url
+          securityContext:
+            {{- include "park-explorer.containerSecurityContext" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}
+      containers:
+        - name: api
+          image: {{ include "park-explorer.image" (dict "root" . "component" .Values.image.api) }}
+          imagePullPolicy: {{ .Values.image.api.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.api.containerPort }}
+          env:
+            - name: PORT
+              value: {{ .Values.api.containerPort | quote }}
+            {{- if .Values.api.corsOrigin }}
+            - name: CORS_ORIGIN
+              value: {{ .Values.api.corsOrigin | quote }}
+            {{- end }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "park-explorer.postgresSecretName" . }}
+                  key: database-url
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+          securityContext:
+            {{- include "park-explorer.containerSecurityContext" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}

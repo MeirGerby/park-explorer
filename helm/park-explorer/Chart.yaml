@@ -1,0 +1,6 @@
+apiVersion: v2
+name: park-explorer
+description: Park Explorer — web (React/nginx), api (NestJS/tRPC), and PostgreSQL, deployed as one release. Targets OpenShift.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
